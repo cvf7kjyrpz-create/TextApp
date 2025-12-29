@@ -14,11 +14,12 @@
             --bg-color: #000000;
             --surface-color: #1C1C1E;
             --modal-bg: #2C2C2E;
-            --input-bg: #3A3A3C;
+            --input-bg: #2C2C2E; /* Etwas dunkler für Suchleiste */
             --btn-bg: #2C2C2E; 
             --btn-text: #A0A0A0;
             --list-text: #B0B0B0;
             --danger-color: #FF453A;
+            --success-color: #30D158;
             --separator: #38383A;
             --accent-blue: #0A84FF;
         }
@@ -28,91 +29,112 @@
             color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 20px 20px 120px 20px; 
+            /* Padding oben erhöht für den fixierten Header Bereich */
+            padding: 160px 20px 120px 20px; 
             min-height: 100vh;
             box-sizing: border-box;
         }
 
+        /* --- FIXED HEADER SECTION --- */
+        .fixed-header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background-color: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 500;
+            padding: 15px 20px 10px 20px;
+            border-bottom: 1px solid #222;
+        }
+
+        /* Top Row: Title & Settings */
+        .header-top {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+        }
+
         h1 {
-            font-weight: 600;
-            margin: 10px 0 25px 0;
-            font-size: 1.1rem;
-            text-align: center;
-            color: #444; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-weight: 700; font-size: 1.4rem; color: #fff; margin: 0;
+        }
+
+        .settings-btn {
+            background: none; border: none; cursor: pointer; padding: 5px;
+            display: flex; align-items: center;
+        }
+        .settings-btn svg { width: 24px; height: 24px; fill: #0A84FF; }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 15px 10px 35px; /* Platz für Lupe */
+            background-color: #1C1C1E;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .search-input:focus { outline: none; background-color: #2c2c2e; }
+        .search-icon {
+            position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+            width: 16px; height: 16px; fill: #888;
+            pointer-events: none;
+        }
+
+        /* Segmented Control (Tabs) */
+        .segmented-control {
+            display: flex;
+            background-color: #1C1C1E;
+            border-radius: 9px;
+            padding: 2px;
+        }
+        .segment-btn {
+            flex: 1;
+            background: transparent;
+            color: #888;
+            border: none;
+            padding: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .segment-btn.active {
+            background-color: #636366;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         /* --- LISTE --- */
         #list-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            width: 100%; max-width: 600px; margin: 0 auto;
+            display: flex; flex-direction: column; gap: 12px;
         }
 
         .item-row {
-            display: flex;
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            overflow: hidden;
-            height: 60px;
+            display: flex; background-color: var(--surface-color);
+            border-radius: 12px; overflow: hidden; height: 60px;
         }
 
         .content-area {
-            flex-grow: 1;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            flex-grow: 1; padding: 0 20px; display: flex; align-items: center;
+            gap: 15px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
         }
         .content-area:active { background-color: #2c2c2e; }
 
-        .type-icon {
-            width: 20px; height: 20px; fill: #555; flex-shrink: 0;
-        }
+        .type-icon { width: 20px; height: 20px; fill: #555; flex-shrink: 0; }
+        .item-info { display: flex; flex-direction: column; overflow: hidden; }
+        .item-label { font-size: 1rem; font-weight: 500; color: var(--list-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-count { font-size: 0.75rem; color: #666; margin-top: 2px; }
 
-        .item-info {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .item-label {
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--list-text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .item-count {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 2px;
-        }
-
-        .action-group {
-            display: flex;
-            border-left: 1px solid var(--separator);
-        }
-
+        .action-group { display: flex; border-left: 1px solid var(--separator); }
         .icon-btn {
-            background: transparent;
-            border: none;
-            width: 50px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 0;
+            background: transparent; border: none; width: 50px; height: 100%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
         }
         .icon-btn svg { width: 18px; height: 18px; fill: #555; }
         .delete-btn:active { background-color: #333; }
@@ -120,177 +142,109 @@
 
         /* --- BOTTOM BAR --- */
         .bottom-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
+            position: fixed; bottom: 0; left: 0; right: 0;
             padding: 0 20px 30px 20px;
             background: linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0));
-            pointer-events: none; 
-            display: flex;
-            justify-content: center;
-            z-index: 100;
+            pointer-events: none; display: flex; justify-content: center; z-index: 90;
         }
-
         .main-btn {
-            pointer-events: auto;
-            padding: 12px 24px;
-            background-color: var(--btn-bg);
-            color: var(--btn-text);
-            font-weight: 500;
-            border: 1px solid #333;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.1s;
+            pointer-events: auto; padding: 12px 24px;
+            background-color: var(--btn-bg); color: var(--btn-text);
+            font-weight: 500; border: 1px solid #333; border-radius: 30px;
+            font-size: 0.9rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: transform 0.1s;
         }
         .main-btn:active { transform: scale(0.95); background-color: #3a3a3c; }
 
-        /* --- MODAL (Hinzufügen) --- */
+        /* --- MODALS --- */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(5px);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.2s;
         }
         .modal-overlay.show { opacity: 1; visibility: visible; }
 
         .modal-box {
-            background-color: var(--modal-bg);
-            padding: 25px;
-            border-radius: 18px;
-            width: 85%;
-            max-width: 320px;
+            background-color: var(--modal-bg); padding: 25px;
+            border-radius: 18px; width: 85%; max-width: 320px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            border: 1px solid #333;
-            max-height: 80vh;
-            overflow-y: auto;
+            border: 1px solid #333; max-height: 80vh; overflow-y: auto;
         }
 
         .modal-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #bbb;
+            font-size: 1rem; font-weight: 600; margin-bottom: 20px;
+            text-align: center; color: #bbb;
         }
 
-        .type-switch {
-            display: flex;
-            background-color: var(--input-bg);
-            border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 15px;
-        }
-        .switch-opt {
-            flex: 1; text-align: center; padding: 8px; font-size: 0.85rem;
-            color: #888; border-radius: 6px; cursor: pointer;
-        }
+        /* --- SETTINGS --- */
+        .settings-group { background-color: #222; border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+        .settings-row { padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; }
+        .settings-row:last-child { border-bottom: none; }
+        .setting-label { font-size: 0.95rem; color: #ddd; }
+        .setting-sub { font-size: 0.75rem; color: #777; margin-top: 4px; max-width: 200px; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success-color); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .manual-action-btn { width: 100%; padding: 15px; background: none; border: none; color: var(--accent-blue); font-size: 1rem; cursor: pointer; text-align: center; border-top: 1px solid #333; }
+        .manual-action-btn:active { background-color: #333; }
+
+        /* --- ADD FORM --- */
+        .type-switch { display: flex; background-color: #3A3A3C; border-radius: 8px; padding: 4px; margin-bottom: 15px; }
+        .switch-opt { flex: 1; text-align: center; padding: 8px; font-size: 0.85rem; color: #888; border-radius: 6px; cursor: pointer; }
         .switch-opt.active { background-color: #555; color: #fff; font-weight: 600; }
-
-        .modal-input, .modal-textarea {
-            width: 100%; padding: 12px; background-color: var(--input-bg);
-            border: 1px solid transparent; border-radius: 10px; color: #ddd;
-            font-size: 0.95rem; box-sizing: border-box; font-family: inherit;
-            resize: none; margin-bottom: 15px;
-        }
+        .modal-input, .modal-textarea { width: 100%; padding: 12px; background-color: #3A3A3C; border: 1px solid transparent; border-radius: 10px; color: #ddd; font-size: 0.95rem; box-sizing: border-box; font-family: inherit; resize: none; margin-bottom: 15px; }
         .modal-input:focus, .modal-textarea:focus { outline: none; background-color: #444; }
         .modal-textarea { min-height: 90px; }
-
-        /* File Upload & Grid */
         .file-upload-wrapper { text-align: center; margin-bottom: 20px; }
-        .file-btn {
-            display: inline-block; padding: 10px 20px;
-            background-color: #444; color: #ccc;
-            border-radius: 8px; font-size: 0.9rem; cursor: pointer;
-        }
-        
-        #previewGrid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-top: 15px;
-        }
-        .preview-thumb {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid #444;
-        }
-
+        .file-btn { display: inline-block; padding: 10px 20px; background-color: #444; color: #ccc; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
+        #previewGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
+        .preview-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; border: 1px solid #444; opacity: 0.8; }
         .modal-actions { display: flex; gap: 10px; }
-        .modal-actions button {
-            flex: 1; padding: 12px; border-radius: 10px; border: none;
-            font-size: 0.9rem; font-weight: 500; cursor: pointer;
-        }
+        .modal-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 0.9rem; font-weight: 500; cursor: pointer; }
         .btn-cancel { background-color: transparent; color: var(--danger-color); }
         .btn-save { background-color: #444; color: #fff; }
 
-        /* --- IMAGE VIEWER OVERLAY --- */
-        #imgViewerOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000;
-            display: flex; flex-direction: column;
-            opacity: 0; visibility: hidden; transition: opacity 0.3s;
-        }
+        /* --- VIEWER --- */
+        #imgViewerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: opacity 0.3s; }
         #imgViewerOverlay.show { opacity: 1; visibility: visible; }
-        
-        #viewerScrollContainer {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            padding: 40px 10px 100px 10px; /* Platz unten für Buttons */
-        }
+        #viewerScrollContainer { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 10px 100px 10px; }
+        .viewer-img { max-width: 100%; border-radius: 4px; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .viewer-actions { position: absolute; bottom: 30px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; background: linear-gradient(to top, rgba(0,0,0,1), transparent); padding-top: 20px; }
+        .viewer-btn { background-color: rgba(50,50,50,0.8); color: white; border: 1px solid #555; padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; backdrop-filter: blur(10px); }
 
-        .viewer-img {
-            max-width: 100%;
-            border-radius: 4px;
-            box-shadow: 0 0 20px rgba(255,255,255,0.1);
-        }
-        
-        .viewer-actions {
-            position: absolute; bottom: 30px; left: 0; right: 0;
-            display: flex; justify-content: center; gap: 20px;
-            background: linear-gradient(to top, rgba(0,0,0,1), transparent);
-            padding-top: 20px;
-        }
-        .viewer-btn {
-            background-color: rgba(50,50,50,0.8);
-            color: white; border: 1px solid #555;
-            padding: 10px 20px; border-radius: 20px;
-            font-size: 0.9rem; cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Toast */
-        #toast {
-            visibility: hidden; min-width: 100px;
-            background-color: #222; color: #ccc; text-align: center;
-            border-radius: 50px; padding: 8px 16px;
-            position: fixed; z-index: 3000; top: 15px;
-            left: 50%; transform: translateX(-50%);
-            font-size: 12px; opacity: 0; transition: opacity 0.3s, top 0.3s;
-            border: 1px solid #333;
-        }
+        #toast { visibility: hidden; min-width: 100px; background-color: #222; color: #ccc; text-align: center; border-radius: 50px; padding: 8px 16px; position: fixed; z-index: 3000; top: 15px; left: 50%; transform: translateX(-50%); font-size: 12px; opacity: 0; transition: opacity 0.3s, top 0.3s; border: 1px solid #333; }
         #toast.show { visibility: visible; opacity: 1; top: 35px; }
+        #loader { display: none; margin-left: 10px; width: 15px; height: 15px; border: 2px solid #fff; border-top: 2px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <h1>SafeSpace</h1>
+    <div class="fixed-header">
+        <div class="header-top">
+            <h1>SafeSpace</h1>
+            <button class="settings-btn" onclick="openSettings()">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L3.16 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            </button>
+        </div>
+
+        <div class="search-container">
+            <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="Suchen..." oninput="handleSearch()">
+        </div>
+
+        <div class="segmented-control">
+            <button id="filterTextBtn" class="segment-btn active" onclick="setListFilter('text')">Texte</button>
+            <button id="filterImageBtn" class="segment-btn" onclick="setListFilter('image')">Bilder</button>
+        </div>
+    </div>
     
     <div id="list-container"></div>
-
     <div class="bottom-bar">
         <button class="main-btn" onclick="openAddModal()">Neues Element</button>
     </div>
@@ -298,36 +252,55 @@
     <div id="modalOverlay" class="modal-overlay">
         <div class="modal-box">
             <div id="modalTitle" class="modal-title">Neu</div>
-            
             <div class="type-switch">
                 <div id="tabText" class="switch-opt active" onclick="switchTab('text')">Text</div>
                 <div id="tabImage" class="switch-opt" onclick="switchTab('image')">Bilder</div>
             </div>
-
             <input type="text" id="modalLabel" class="modal-input" placeholder="Titel" autocomplete="off">
-            
-            <div id="textSection">
-                <textarea id="modalText" class="modal-textarea" placeholder="Text Inhalt"></textarea>
-            </div>
-
+            <div id="textSection"><textarea id="modalText" class="modal-textarea" placeholder="Inhalt"></textarea></div>
             <div id="imageSection" style="display: none;">
                 <div class="file-upload-wrapper">
-                    <label for="fileInput" class="file-btn">Bilder auswählen</label>
+                    <label for="fileInput" class="file-btn">Bilder wählen</label>
                     <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleFileSelect(this)">
+                    <div style="font-size: 0.75rem; color:#666; margin-top:8px;">Auto-Komprimierung aktiv.</div>
                     <div id="previewGrid"></div>
                 </div>
             </div>
-
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
-                <button id="modalSaveBtn" class="btn-save" onclick="handleSave()">Speichern</button>
+                <button id="modalSaveBtn" class="btn-save" onclick="handleSave()">Speichern <div id="loader"></div></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settingsOverlay" class="modal-overlay">
+        <div class="modal-box" style="padding: 0; overflow: hidden;">
+            <div style="padding: 20px; text-align: center; font-weight: 600; color: #ddd; background-color: #2c2c2e;">Einstellungen</div>
+            <div class="settings-group">
+                <div class="settings-row">
+                    <div>
+                        <div class="setting-label">Auto-Backup</div>
+                        <div class="setting-sub">Backup-Dialog nach Änderung.</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="autoBackupToggle" onchange="toggleAutoBackup()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-group">
+                <button class="manual-action-btn" onclick="exportBackup()">Backup jetzt erstellen</button>
+                <button class="manual-action-btn" onclick="document.getElementById('importFile').click()">Backup wiederherstellen</button>
+                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(this)">
+            </div>
+            <div style="padding: 10px;">
+                <button class="btn-save" style="width: 100%; padding: 12px; border-radius: 10px;" onclick="closeSettings()">Fertig</button>
             </div>
         </div>
     </div>
 
     <div id="imgViewerOverlay">
-        <div id="viewerScrollContainer">
-            </div>
+        <div id="viewerScrollContainer"></div>
         <div class="viewer-actions">
             <button class="viewer-btn" onclick="closeImageViewer()">Schließen</button>
             <button class="viewer-btn" style="color: var(--accent-blue);" onclick="shareImages()">Teilen</button>
@@ -337,63 +310,81 @@
     <div id="toast">Info</div>
 
     <script>
+        // CONFIG & DB
+        const DB_NAME = 'SafeSpaceDB'; const STORE_NAME = 'items';
+        let autoBackupEnabled = JSON.parse(localStorage.getItem('autoBackupEnabled')) || false;
+        document.getElementById('autoBackupToggle').checked = autoBackupEnabled;
+
         const ICON_TEXT = `<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
         const ICON_IMAGE = `<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
         const ICON_DELETE = `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
 
-        // --- DATABASE ---
-        const DB_NAME = 'SafeSpaceDB';
-        const STORE_NAME = 'items';
-
         const dbPromise = new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, 2); // Version 2 für neue Struktur
+            const request = indexedDB.open(DB_NAME, 2);
             request.onupgradeneeded = (e) => {
                 const db = e.target.result;
-                if (!db.objectStoreNames.contains(STORE_NAME)) {
-                    db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-                }
+                if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
             };
             request.onsuccess = (e) => resolve(e.target.result);
             request.onerror = (e) => reject(e);
         });
 
         async function getAllItems() {
-            const db = await dbPromise;
-            return new Promise((resolve) => {
+            const db = await dbPromise; return new Promise((resolve) => {
                 const tx = db.transaction(STORE_NAME, 'readonly');
                 const req = tx.objectStore(STORE_NAME).getAll();
                 req.onsuccess = () => resolve(req.result || []);
             });
         }
-
         async function addItem(item) {
-            const db = await dbPromise;
-            return new Promise((resolve) => {
+            const db = await dbPromise; return new Promise((resolve) => {
                 const tx = db.transaction(STORE_NAME, 'readwrite');
                 tx.objectStore(STORE_NAME).add(item);
                 tx.oncomplete = () => resolve();
             });
         }
-
         async function deleteItem(id) {
-            const db = await dbPromise;
-            return new Promise((resolve) => {
+            const db = await dbPromise; return new Promise((resolve) => {
                 const tx = db.transaction(STORE_NAME, 'readwrite');
                 tx.objectStore(STORE_NAME).delete(id);
                 tx.oncomplete = () => resolve();
             });
         }
+        async function clearAllItems() {
+            const db = await dbPromise; return new Promise((resolve) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                tx.objectStore(STORE_NAME).clear();
+                tx.oncomplete = () => resolve();
+            });
+        }
 
-        // --- APP LOGIC ---
-        let currentMode = 'text'; 
-        let currentImages = []; // Array of Base64 strings
-        let activeItems = [];
-        let viewingItemImages = []; // Aktuell betrachtete Bilder
+        // --- NEW STATE LOGIC FOR TABS & SEARCH ---
+        let currentMode = 'text'; // For Add Modal
+        let currentImages = []; 
+        let allItems = []; // Contains ALL DB items
+        let viewingItemImages = [];
+        
+        // Filter States
+        let currentListFilter = 'text'; // 'text' or 'image'
+        let currentSearchQuery = '';
 
         loadList();
 
         async function loadList() {
-            activeItems = await getAllItems();
+            allItems = await getAllItems();
+            renderList();
+        }
+
+        function setListFilter(mode) {
+            currentListFilter = mode;
+            // UI Toggle update
+            document.getElementById('filterTextBtn').classList.toggle('active', mode === 'text');
+            document.getElementById('filterImageBtn').classList.toggle('active', mode === 'image');
+            renderList();
+        }
+
+        function handleSearch() {
+            currentSearchQuery = document.getElementById('searchInput').value.toLowerCase();
             renderList();
         }
 
@@ -401,47 +392,48 @@
             const container = document.getElementById('list-container');
             container.innerHTML = '';
 
-            if(activeItems.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:#333; font-size: 0.8rem; margin-top:40px;">Leer</div>';
+            // 1. Filter by Tab (Text vs Image)
+            let filtered = allItems.filter(item => item.type === currentListFilter);
+
+            // 2. Filter by Search Query
+            if(currentSearchQuery) {
+                filtered = filtered.filter(item => item.label.toLowerCase().includes(currentSearchQuery));
+            }
+
+            if(filtered.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:#555; font-size: 0.9rem; margin-top:40px;">Keine Einträge gefunden.</div>';
                 return;
             }
 
-            activeItems.forEach((item) => {
+            filtered.forEach((item) => {
                 const row = document.createElement('div');
                 row.className = 'item-row';
                 
                 const content = document.createElement('div');
                 content.className = 'content-area';
-                
                 const icon = document.createElement('div');
                 icon.className = 'type-icon';
                 icon.innerHTML = item.type === 'image' ? ICON_IMAGE : ICON_TEXT;
 
                 const infoDiv = document.createElement('div');
                 infoDiv.className = 'item-info';
-
                 const label = document.createElement('span');
                 label.className = 'item-label';
                 label.innerText = item.label;
-                
                 infoDiv.appendChild(label);
 
-                // Wenn es Bilder sind, zeige Anzahl an
                 if(item.type === 'image' && Array.isArray(item.content)) {
                     const count = document.createElement('span');
                     count.className = 'item-count';
                     count.innerText = item.content.length + (item.content.length === 1 ? ' Bild' : ' Bilder');
                     infoDiv.appendChild(count);
                 }
-
                 content.appendChild(icon);
                 content.appendChild(infoDiv);
 
                 content.onclick = () => {
-                    if (item.type === 'text') {
-                        copyToClipboard(item.content);
-                    } else {
-                        // Support für alte Einträge (String) und neue (Array)
+                    if (item.type === 'text') copyToClipboard(item.content);
+                    else {
                         const imgs = Array.isArray(item.content) ? item.content : [item.content];
                         openImageViewer(imgs);
                     }
@@ -461,25 +453,32 @@
             });
         }
 
-        // --- MODAL ---
+        // --- STANDARD APP LOGIC (Modals, Saving, etc.) ---
         const modalOverlay = document.getElementById('modalOverlay');
+        const settingsOverlay = document.getElementById('settingsOverlay');
         const modalLabel = document.getElementById('modalLabel');
         const modalText = document.getElementById('modalText');
         const previewGrid = document.getElementById('previewGrid');
         const fileInput = document.getElementById('fileInput');
+        const modalSaveBtn = document.getElementById('modalSaveBtn');
+        const loader = document.getElementById('loader');
 
         function openAddModal() {
-            modalLabel.value = '';
-            modalText.value = '';
-            fileInput.value = '';
-            previewGrid.innerHTML = '';
-            currentImages = [];
-            switchTab('text');
+            modalLabel.value = ''; modalText.value = ''; fileInput.value = '';
+            previewGrid.innerHTML = ''; currentImages = [];
+            modalSaveBtn.disabled = false; loader.style.display = 'none';
+            // Default to the tab currently visible
+            switchTab(currentListFilter); 
             modalOverlay.classList.add('show');
             setTimeout(() => modalLabel.focus(), 50);
         }
-
         function closeModal() { modalOverlay.classList.remove('show'); }
+        function openSettings() { settingsOverlay.classList.add('show'); }
+        function closeSettings() { settingsOverlay.classList.remove('show'); }
+        function toggleAutoBackup() {
+            autoBackupEnabled = document.getElementById('autoBackupToggle').checked;
+            localStorage.setItem('autoBackupEnabled', JSON.stringify(autoBackupEnabled));
+        }
 
         function switchTab(mode) {
             currentMode = mode;
@@ -489,123 +488,104 @@
             document.getElementById('imageSection').style.display = mode === 'image' ? 'block' : 'none';
         }
 
-        // Handle MULTIPLE files
-        function handleFileSelect(input) {
+        async function handleFileSelect(input) {
             if (input.files && input.files.length > 0) {
-                previewGrid.innerHTML = '';
-                currentImages = []; // Reset current
-
-                Array.from(input.files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const base64 = e.target.result;
-                        currentImages.push(base64);
-                        
-                        // Add thumb
-                        const img = document.createElement('img');
-                        img.src = base64;
-                        img.className = 'preview-thumb';
-                        previewGrid.appendChild(img);
-                    }
-                    reader.readAsDataURL(file);
-                });
+                previewGrid.innerHTML = ''; currentImages = [];
+                modalSaveBtn.disabled = true; loader.style.display = 'inline-block';
+                const files = Array.from(input.files);
+                for (let file of files) {
+                    const compressed = await compressImage(file);
+                    currentImages.push(compressed);
+                    const img = document.createElement('img');
+                    img.src = compressed; img.className = 'preview-thumb';
+                    previewGrid.appendChild(img);
+                }
+                modalSaveBtn.disabled = false; loader.style.display = 'none';
             }
+        }
+        function compressImage(file) {
+            return new Promise((resolve) => {
+                const maxWidth = 1000; const quality = 0.6;
+                const reader = new FileReader(); reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image(); img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                };
+            });
         }
 
         async function handleSave() {
             const label = modalLabel.value.trim();
             if (!label) return;
-
             let newItem = { label: label, type: currentMode };
-
             if (currentMode === 'text') {
-                const text = modalText.value.trim();
-                if (!text) return;
-                newItem.content = text;
+                const text = modalText.value.trim(); if (!text) return; newItem.content = text;
             } else {
-                if (currentImages.length === 0) {
-                    alert("Keine Bilder ausgewählt.");
-                    return;
-                }
-                newItem.content = currentImages; // Save ARRAY
+                if (currentImages.length === 0) { alert("Kein Bild."); return; } newItem.content = currentImages;
             }
-
-            await addItem(newItem);
-            loadList();
-            closeModal();
+            await addItem(newItem); await loadList(); closeModal();
+            if(autoBackupEnabled) setTimeout(() => { exportBackup(); }, 500);
         }
 
         async function handleDelete(id) {
-            if(confirm('Löschen?')) {
-                await deleteItem(id);
-                loadList();
+            if(confirm('Löschen?')) { 
+                await deleteItem(id); await loadList(); 
+                if(autoBackupEnabled) setTimeout(() => { exportBackup(); }, 500);
             }
         }
 
-        async function copyToClipboard(text) {
-            try {
-                await navigator.clipboard.writeText(text);
-                showToast("Kopiert!");
-            } catch (err) {
-                showToast("Fehler beim Kopieren");
-            }
+        async function exportBackup() {
+            showToast("Backup wird erstellt...");
+            const allData = await getAllItems();
+            const dataStr = JSON.stringify(allData);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const file = new File([blob], "SafeSpace_Backup.json", {type: "application/json"});
+            if (navigator.share) { try { await navigator.share({ files: [file] }); showToast("Wähle Speicherort"); } catch(e) {} }
+            else { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = "SafeSpace_Backup.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+        }
+        async function importBackup(input) {
+            const file = input.files[0]; if (!file) return;
+            if(!confirm("ACHTUNG: Überschreibt alle aktuellen Daten!")) { input.value = ''; return; }
+            showToast("Lade...");
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const items = JSON.parse(e.target.result); if(!Array.isArray(items)) throw new Error();
+                    await clearAllItems(); for(let item of items) { delete item.id; await addItem(item); }
+                    loadList(); showToast("Wiederhergestellt!"); closeSettings();
+                } catch (err) { alert("Fehler beim Laden."); }
+            };
+            reader.readAsText(file);
         }
 
-        // --- MULTI IMAGE VIEWER ---
         const imgViewer = document.getElementById('imgViewerOverlay');
         const viewerContainer = document.getElementById('viewerScrollContainer');
-
         function openImageViewer(imagesArray) {
-            viewingItemImages = imagesArray;
-            viewerContainer.innerHTML = ''; // Clear old
-
-            imagesArray.forEach(imgSrc => {
-                const img = document.createElement('img');
-                img.src = imgSrc;
-                img.className = 'viewer-img';
-                viewerContainer.appendChild(img);
-            });
-
+            viewingItemImages = imagesArray; viewerContainer.innerHTML = '';
+            imagesArray.forEach(imgSrc => { const img = document.createElement('img'); img.src = imgSrc; img.className = 'viewer-img'; viewerContainer.appendChild(img); });
             imgViewer.classList.add('show');
         }
-
-        function closeImageViewer() {
-            imgViewer.classList.remove('show');
-        }
-
-        // Share ALL images
+        function closeImageViewer() { imgViewer.classList.remove('show'); }
+        async function copyToClipboard(text) { try { await navigator.clipboard.writeText(text); showToast("Kopiert!"); } catch (err) { showToast("Fehler"); } }
         async function shareImages() {
             if (!viewingItemImages || viewingItemImages.length === 0) return;
-
             const filesArray = [];
-
-            // Convert all base64 to Blob/File
             for (let i = 0; i < viewingItemImages.length; i++) {
-                const res = await fetch(viewingItemImages[i]);
-                const blob = await res.blob();
-                // Eindeutige Namen: bild_1.png, bild_2.png
-                const file = new File([blob], `bild_${i+1}.png`, { type: "image/png" });
-                filesArray.push(file);
+                const res = await fetch(viewingItemImages[i]); const blob = await res.blob();
+                const file = new File([blob], `bild_${i+1}.jpg`, { type: "image/jpeg" }); filesArray.push(file);
             }
-
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        files: filesArray
-                    });
-                } catch (err) {
-                    console.log("Teilen abgebrochen");
-                }
-            } else {
-                alert("Teilen nicht unterstützt.");
-            }
+            if (navigator.share) { try { await navigator.share({ files: filesArray }); } catch (err) {} } else { alert("Nicht unterstützt"); }
         }
-
         function showToast(msg) {
-            const toast = document.getElementById("toast");
-            toast.innerText = msg;
-            toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1000);
+            const toast = document.getElementById("toast"); toast.innerText = msg; toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1500);
         }
     </script>
 </body>
