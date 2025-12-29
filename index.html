@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CopyPaste</title>
+    <title>SafeSpace</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="CopyPaste">
+    <meta name="apple-mobile-web-app-title" content="SafeSpace">
 
     <style>
         :root {
@@ -16,8 +16,9 @@
             --modal-bg: #2C2C2E;
             --input-bg: #3A3A3C;
             --btn-bg: #2C2C2E; 
-            --btn-text: #A0A0A0; /* Helles Grau für den Button-Text */
-            --list-text: #999999; /* Helles Grau für die Snippets */
+            --btn-text: #A0A0A0;
+            --list-text: #B0B0B0;
+            --accent-color: #0A84FF;
             --danger-color: #FF453A;
             --separator: #38383A;
         }
@@ -42,6 +43,7 @@
             letter-spacing: 1px;
         }
 
+        /* --- LISTE --- */
         #list-container {
             width: 100%;
             max-width: 600px;
@@ -56,24 +58,39 @@
             background-color: var(--surface-color);
             border-radius: 12px;
             overflow: hidden;
-            transition: background-color 0.2s;
+            height: 60px; /* Feste Höhe für Einheitlichkeit */
         }
 
-        .copy-area {
+        /* Linker Bereich (Icon + Text) */
+        .content-area {
             flex-grow: 1;
-            padding: 16px 20px;
-            font-size: 1rem;
-            font-weight: 500;
-            /* HIER: Die gewünschte hellgraue Schrift */
-            color: var(--list-text);
-            cursor: pointer;
+            padding: 0 20px;
             display: flex;
             align-items: center;
-            user-select: none; 
+            gap: 15px;
+            cursor: pointer;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .copy-area:active { background-color: #2c2c2e; }
+        .content-area:active { background-color: #2c2c2e; }
 
+        .type-icon {
+            width: 20px;
+            height: 20px;
+            fill: #555;
+            flex-shrink: 0;
+        }
+
+        .item-label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--list-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Rechter Bereich (Buttons) */
         .action-group {
             display: flex;
             border-left: 1px solid var(--separator);
@@ -82,7 +99,8 @@
         .icon-btn {
             background: transparent;
             border: none;
-            width: 44px;
+            width: 50px;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -90,22 +108,18 @@
             padding: 0;
         }
         .icon-btn svg { width: 18px; height: 18px; fill: #555; }
-        .edit-btn:active { background-color: #333; }
-        .delete-btn:active { background-color: #333; }
+        .edit-btn:active, .delete-btn:active { background-color: #333; }
         .delete-btn svg { fill: #cf6679; }
 
-        /* Der untere Bereich - Jetzt absolut zentriert */
+        /* --- BOTTOM BAR --- */
         .bottom-bar {
             position: fixed;
-            bottom: 0;
-            left: 0; 
-            right: 0; /* Wichtig für Zentrierung */
-            padding: 0 20px 30px 20px; /* Padding unten etwas höher für iPhones ohne Home Button */
+            bottom: 0; left: 0; right: 0;
+            padding: 0 20px 30px 20px;
             background: linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0));
             pointer-events: none; 
             display: flex;
-            justify-content: center; /* Flexbox Zentrierung */
-            align-items: flex-end;
+            justify-content: center;
             z-index: 100;
         }
 
@@ -115,21 +129,16 @@
             background-color: var(--btn-bg);
             color: var(--btn-text);
             font-weight: 500;
-            border: 1px solid #333; /* Dezenter Rahmen */
+            border: 1px solid #333;
             border-radius: 30px;
             font-size: 0.9rem;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             transition: transform 0.1s;
         }
-        
-        .main-btn:active {
-            transform: scale(0.95);
-            background-color: #3a3a3c;
-            color: #ccc;
-        }
+        .main-btn:active { transform: scale(0.95); background-color: #3a3a3c; }
 
-        /* --- MODAL --- */
+        /* --- MODAL (Hinzufügen) --- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -140,11 +149,9 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
+            opacity: 0; visibility: hidden;
             transition: opacity 0.2s;
         }
-        
         .modal-overlay.show { opacity: 1; visibility: visible; }
 
         .modal-box {
@@ -165,11 +172,27 @@
             color: #bbb;
         }
 
-        .modal-input-group {
+        /* Tabs für Text/Bild */
+        .type-switch {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 25px;
+            background-color: var(--input-bg);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+        }
+        .switch-opt {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.85rem;
+            color: #888;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .switch-opt.active {
+            background-color: #555;
+            color: #fff;
+            font-weight: 600;
         }
 
         .modal-input, .modal-textarea {
@@ -183,44 +206,89 @@
             box-sizing: border-box;
             font-family: inherit;
             resize: none;
+            margin-bottom: 15px;
         }
-        .modal-input:focus, .modal-textarea:focus {
-            outline: none;
-            background-color: #444;
-        }
+        .modal-input:focus, .modal-textarea:focus { outline: none; background-color: #444; }
         .modal-textarea { min-height: 90px; }
 
-        .modal-actions { display: flex; gap: 10px; }
-
-        .modal-actions button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
+        /* File Upload Styling */
+        .file-upload-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .file-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #444;
+            color: #ccc;
+            border-radius: 8px;
             font-size: 0.9rem;
-            font-weight: 500;
             cursor: pointer;
+        }
+        #imagePreview {
+            display: block;
+            max-width: 100%;
+            max-height: 150px;
+            margin: 15px auto 0 auto;
+            border-radius: 8px;
+            object-fit: contain;
+            display: none;
+        }
+
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-actions button {
+            flex: 1; padding: 12px; border-radius: 10px; border: none;
+            font-size: 0.9rem; font-weight: 500; cursor: pointer;
         }
         .btn-cancel { background-color: transparent; color: var(--danger-color); }
         .btn-save { background-color: #444; color: #fff; }
 
+        /* --- IMAGE VIEWER MODAL --- */
+        #imgViewerOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.3s;
+        }
+        #imgViewerOverlay.show { opacity: 1; visibility: visible; }
+        
+        #fullImage {
+            max-width: 100%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+        
+        .viewer-actions {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            gap: 20px;
+        }
+        .viewer-btn {
+            background-color: #333;
+            color: white;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
         /* Toast */
         #toast {
-            visibility: hidden;
-            min-width: 100px;
-            background-color: #222;
-            color: #ccc;
-            text-align: center;
-            border-radius: 50px;
-            padding: 8px 16px;
-            position: fixed;
-            z-index: 2000;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.3s, top 0.3s;
+            visibility: hidden; min-width: 100px;
+            background-color: #222; color: #ccc; text-align: center;
+            border-radius: 50px; padding: 8px 16px;
+            position: fixed; z-index: 3000; top: 15px;
+            left: 50%; transform: translateX(-50%);
+            font-size: 12px; opacity: 0; transition: opacity 0.3s, top 0.3s;
             border: 1px solid #333;
         }
         #toast.show { visibility: visible; opacity: 1; top: 35px; }
@@ -228,148 +296,256 @@
 </head>
 <body>
 
-    <h1>Meine Snippets</h1>
+    <h1>SafeSpace</h1>
     
     <div id="list-container"></div>
 
     <div class="bottom-bar">
-        <button class="main-btn" onclick="openAddModal()">Neues Snippet</button>
+        <button class="main-btn" onclick="openAddModal()">Neues Element</button>
     </div>
 
     <div id="modalOverlay" class="modal-overlay">
         <div class="modal-box">
-            <div id="modalTitle" class="modal-title">Neues Snippet</div>
+            <div id="modalTitle" class="modal-title">Neu</div>
             
-            <div class="modal-input-group">
-                <input type="text" id="modalLabel" class="modal-input" placeholder="Titel" autocomplete="off">
-                <textarea id="modalText" class="modal-textarea" placeholder="Text"></textarea>
+            <div class="type-switch">
+                <div id="tabText" class="switch-opt active" onclick="switchTab('text')">Text</div>
+                <div id="tabImage" class="switch-opt" onclick="switchTab('image')">Bild</div>
+            </div>
+
+            <input type="text" id="modalLabel" class="modal-input" placeholder="Titel" autocomplete="off">
+            
+            <div id="textSection">
+                <textarea id="modalText" class="modal-textarea" placeholder="Text Inhalt"></textarea>
+            </div>
+
+            <div id="imageSection" style="display: none;">
+                <div class="file-upload-wrapper">
+                    <label for="fileInput" class="file-btn">Bild auswählen</label>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
+                    <img id="imagePreview" src="" alt="Vorschau">
+                </div>
             </div>
 
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
-                <button id="modalSaveBtn" class="btn-save" onclick="handleModalSave()">Speichern</button>
+                <button id="modalSaveBtn" class="btn-save" onclick="handleSave()">Speichern</button>
             </div>
         </div>
     </div>
 
-    <div id="toast">Kopiert</div>
+    <div id="imgViewerOverlay">
+        <img id="fullImage" src="">
+        <div class="viewer-actions">
+            <button class="viewer-btn" onclick="closeImageViewer()">Schließen</button>
+            <button class="viewer-btn" style="background-color: #0A84FF;" onclick="shareImage()">Teilen / Sichern</button>
+        </div>
+    </div>
+
+    <div id="toast">Info</div>
 
     <script>
-        const ICON_EDIT = `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+        // --- ICONS ---
+        const ICON_TEXT = `<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+        const ICON_IMAGE = `<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
         const ICON_DELETE = `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
 
-        let buttons = JSON.parse(localStorage.getItem('myCopyButtons')) || [];
-        let editIndex = -1;
-        
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalLabel = document.getElementById('modalLabel');
-        const modalText = document.getElementById('modalText');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalSaveBtn = document.getElementById('modalSaveBtn');
+        // --- DATABASE HELPERS (IndexedDB Wrapper) ---
+        const DB_NAME = 'SafeSpaceDB';
+        const STORE_NAME = 'items';
 
-        renderList();
+        const dbPromise = new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (e) => {
+                e.target.result.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+            };
+            request.onsuccess = (e) => resolve(e.target.result);
+            request.onerror = (e) => reject(e);
+        });
+
+        async function getAllItems() {
+            const db = await dbPromise;
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result || []);
+            });
+        }
+
+        async function addItem(item) {
+            const db = await dbPromise;
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                tx.objectStore(STORE_NAME).add(item);
+                tx.oncomplete = () => resolve();
+            });
+        }
+
+        async function deleteItem(id) {
+            const db = await dbPromise;
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                tx.objectStore(STORE_NAME).delete(id);
+                tx.oncomplete = () => resolve();
+            });
+        }
+
+        // --- APP LOGIC ---
+        let currentMode = 'text'; // 'text' or 'image'
+        let currentImageBase64 = null;
+        let activeItems = [];
+
+        // Init
+        loadList();
+
+        async function loadList() {
+            activeItems = await getAllItems();
+            renderList();
+        }
 
         function renderList() {
             const container = document.getElementById('list-container');
             container.innerHTML = '';
 
-            if(buttons.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:#333; font-size: 0.8rem; margin-top:40px;">Liste ist leer</div>';
+            if(activeItems.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:#333; font-size: 0.8rem; margin-top:40px;">Leer</div>';
                 return;
             }
 
-            buttons.forEach((btn, index) => {
+            activeItems.forEach((item) => {
                 const row = document.createElement('div');
                 row.className = 'item-row';
                 
-                const copyArea = document.createElement('div');
-                copyArea.className = 'copy-area';
-                copyArea.innerText = btn.label;
-                copyArea.onclick = () => copyToClipboard(btn.text);
+                // Content Click Area
+                const content = document.createElement('div');
+                content.className = 'content-area';
+                
+                // Icon
+                const icon = document.createElement('div');
+                icon.className = 'type-icon';
+                icon.innerHTML = item.type === 'image' ? ICON_IMAGE : ICON_TEXT;
 
+                // Label
+                const label = document.createElement('div');
+                label.className = 'item-label';
+                label.innerText = item.label;
+
+                content.appendChild(icon);
+                content.appendChild(label);
+
+                // Click Action
+                content.onclick = () => {
+                    if (item.type === 'text') {
+                        copyToClipboard(item.content);
+                    } else {
+                        openImageViewer(item.content);
+                    }
+                };
+
+                // Action Group (Only Delete for minimalism)
                 const actionGroup = document.createElement('div');
                 actionGroup.className = 'action-group';
-
-                const editBtn = document.createElement('button');
-                editBtn.className = 'icon-btn edit-btn';
-                editBtn.innerHTML = ICON_EDIT;
-                editBtn.onclick = () => loadForEdit(index);
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'icon-btn delete-btn';
                 deleteBtn.innerHTML = ICON_DELETE;
-                deleteBtn.onclick = () => deleteButton(index);
+                deleteBtn.onclick = () => handleDelete(item.id);
 
-                actionGroup.appendChild(editBtn);
                 actionGroup.appendChild(deleteBtn);
-                row.appendChild(copyArea);
+                row.appendChild(content);
                 row.appendChild(actionGroup);
                 container.appendChild(row);
             });
         }
 
+        // --- MODAL LOGIC ---
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalLabel = document.getElementById('modalLabel');
+        const modalText = document.getElementById('modalText');
+        const imagePreview = document.getElementById('imagePreview');
+        const fileInput = document.getElementById('fileInput');
+
         function openAddModal() {
-            editIndex = -1;
-            modalTitle.innerText = "Neues Snippet";
-            modalSaveBtn.innerText = "Erstellen";
+            // Reset
             modalLabel.value = '';
             modalText.value = '';
+            fileInput.value = '';
+            imagePreview.src = '';
+            imagePreview.style.display = 'none';
+            currentImageBase64 = null;
+            switchTab('text');
+            
             modalOverlay.classList.add('show');
             setTimeout(() => modalLabel.focus(), 50);
         }
 
-        function loadForEdit(index) {
-            editIndex = index;
-            modalTitle.innerText = "Bearbeiten";
-            modalSaveBtn.innerText = "OK";
-            modalLabel.value = buttons[index].label;
-            modalText.value = buttons[index].text;
-            modalOverlay.classList.add('show');
-            setTimeout(() => modalText.focus(), 50);
-        }
-
         function closeModal() {
             modalOverlay.classList.remove('show');
-            setTimeout(() => {
-                editIndex = -1;
-                modalLabel.value = '';
-                modalText.value = '';
-            }, 200);
         }
 
-        function handleModalSave() {
+        function switchTab(mode) {
+            currentMode = mode;
+            document.getElementById('tabText').className = `switch-opt ${mode === 'text' ? 'active' : ''}`;
+            document.getElementById('tabImage').className = `switch-opt ${mode === 'image' ? 'active' : ''}`;
+            
+            document.getElementById('textSection').style.display = mode === 'text' ? 'block' : 'none';
+            document.getElementById('imageSection').style.display = mode === 'image' ? 'block' : 'none';
+        }
+
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageBase64 = e.target.result;
+                    imagePreview.src = currentImageBase64;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function handleSave() {
             const label = modalLabel.value.trim();
-            const text = modalText.value.trim();
-
-            if (!label || !text) return;
-
-            if (editIndex === -1) {
-                buttons.push({ label, text });
-            } else {
-                buttons[editIndex] = { label, text };
+            
+            if (!label) {
+                alert("Bitte einen Titel eingeben.");
+                return;
             }
 
-            saveData();
+            let newItem = { label: label, type: currentMode };
+
+            if (currentMode === 'text') {
+                const text = modalText.value.trim();
+                if (!text) return;
+                newItem.content = text;
+            } else {
+                if (!currentImageBase64) {
+                    alert("Bitte ein Bild auswählen.");
+                    return;
+                }
+                newItem.content = currentImageBase64;
+            }
+
+            await addItem(newItem);
+            loadList(); // Reload from DB
             closeModal();
         }
 
-        function deleteButton(index) {
+        async function handleDelete(id) {
             if(confirm('Löschen?')) {
-                buttons.splice(index, 1);
-                saveData();
+                await deleteItem(id);
+                loadList();
             }
         }
 
-        function saveData() {
-            localStorage.setItem('myCopyButtons', JSON.stringify(buttons));
-            renderList();
-        }
-
+        // --- ACTIONS ---
         async function copyToClipboard(text) {
             try {
                 await navigator.clipboard.writeText(text);
-                showToast();
+                showToast("Kopiert!");
             } catch (err) {
+                // Fallback method
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
                 textArea.style.position = "fixed";
@@ -377,14 +553,53 @@
                 textArea.select();
                 try {
                     document.execCommand('copy');
-                    showToast();
-                } catch (err) {}
+                    showToast("Kopiert!");
+                } catch (e) {}
                 document.body.removeChild(textArea);
             }
         }
 
-        function showToast() {
+        // --- IMAGE VIEWER ---
+        const imgViewer = document.getElementById('imgViewerOverlay');
+        const fullImage = document.getElementById('fullImage');
+        let currentViewingImage = null;
+
+        function openImageViewer(base64Data) {
+            currentViewingImage = base64Data;
+            fullImage.src = base64Data;
+            imgViewer.classList.add('show');
+        }
+
+        function closeImageViewer() {
+            imgViewer.classList.remove('show');
+            setTimeout(() => { fullImage.src = ''; }, 300);
+        }
+
+        async function shareImage() {
+            if (!currentViewingImage) return;
+
+            // Convert Base64 back to Blob for Sharing
+            const res = await fetch(currentViewingImage);
+            const blob = await res.blob();
+            const file = new File([blob], "image.png", { type: "image/png" });
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        files: [file]
+                    });
+                    showToast("Erfolg!");
+                } catch (err) {
+                    console.log("Teilen abgebrochen");
+                }
+            } else {
+                alert("Teilen wird von diesem Browser nicht unterstützt. Bitte Screenshot machen.");
+            }
+        }
+
+        function showToast(msg) {
             const toast = document.getElementById("toast");
+            toast.innerText = msg;
             toast.className = "show";
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1000);
         }
