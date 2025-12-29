@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CopyPaste App</title>
+    <title>CopyPaste</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,245 +11,323 @@
 
     <style>
         :root {
-            --bg-color: #121212;
-            --surface-color: #1e1e1e;
-            --primary-color: #BB86FC;
-            --text-color: #e0e0e0;
-            --secondary-text: #a0a0a0;
-            --danger-color: #cf6679;
+            --bg-color: #000000;
+            --surface-color: #1C1C1E; /* iOS System Gray 6 Dark */
+            --input-bg: #2C2C2E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #EBEBF599;
+            --accent-color: #0A84FF; /* iOS Blue */
+            --danger-color: #FF453A; /* iOS Red */
+            --separator: #38383A;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 20px 20px 140px 20px; /* Viel Padding unten für das Input Feld */
             display: flex;
             flex-direction: column;
-            align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
         }
 
         h1 {
-            font-weight: 300;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
+            font-weight: 700;
+            margin: 20px 0 30px 0;
+            font-size: 2rem;
+            letter-spacing: -0.5px;
         }
 
-        /* Container für die Grid-Ansicht */
-        #button-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 Spalten */
-            gap: 15px;
+        /* Container für die Liste */
+        #list-container {
             width: 100%;
             max-width: 600px;
-            margin-bottom: 40px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        /* Der eigentliche Klick-Button */
-        .copy-card {
+        /* Das einzelne Element (Zeile) */
+        .item-row {
+            display: flex;
             background-color: var(--surface-color);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: transform 0.1s;
+        }
+
+        /* Der Hauptbereich (Kopieren) */
+        .copy-area {
+            flex-grow: 1;
+            padding: 18px 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
-            position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            user-select: none;
+            display: flex;
+            align-items: center;
+            /* Verhindert Textauswahl beim Tippen */
+            user-select: none; 
             -webkit-tap-highlight-color: transparent;
         }
 
-        .copy-card:active {
-            transform: scale(0.96);
-            background-color: #2c2c2c;
+        .copy-area:active {
+            background-color: #3a3a3c;
         }
 
-        .btn-label {
-            font-size: 1.1rem;
-            font-weight: 600;
-            display: block;
+        /* Bereich für die kleinen Buttons rechts */
+        .action-group {
+            display: flex;
+            border-left: 1px solid var(--separator);
         }
 
-        .btn-preview {
-            font-size: 0.8rem;
-            color: var(--secondary-text);
-            margin-top: 5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Löschen Button (kleines X) */
-        .delete-btn {
-            position: absolute;
-            top: 5px;
-            right: 8px;
-            color: var(--danger-color);
-            font-size: 1.2rem;
-            background: none;
+        .icon-btn {
+            background: transparent;
             border: none;
-            padding: 5px;
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            opacity: 0.6;
+            transition: background 0.2s;
+            padding: 0;
         }
-        
-        .delete-btn:hover { opacity: 1; }
 
-        /* Eingabebereich */
-        .input-area {
-            background-color: var(--surface-color);
-            padding: 20px;
-            border-radius: 15px;
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-secondary);
+        }
+
+        .edit-btn:active { background-color: #3a3a3c; }
+        .delete-btn:active { background-color: #3a3a3c; }
+        
+        .delete-btn svg { fill: var(--danger-color); }
+        .edit-btn svg { fill: var(--accent-color); }
+
+        /* Eingabebereich (Fixiert am unteren Rand) */
+        .input-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            max-width: 600px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-            margin-top: auto; /* Drückt Input nach unten */
+            background-color: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-sizing: border-box;
+            border-top: 1px solid var(--separator);
+            z-index: 100;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            background-color: #2c2c2c;
-            border: 1px solid #333;
-            border-radius: 8px;
+            padding: 14px;
+            background-color: var(--input-bg);
+            border: none;
+            border-radius: 10px;
             color: white;
             font-size: 1rem;
             box-sizing: border-box;
+            font-family: inherit;
         }
 
         input:focus {
-            outline: 2px solid var(--primary-color);
-            border-color: transparent;
+            outline: 2px solid var(--accent-color);
         }
 
-        button.add-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: #000;
-            font-weight: bold;
+        button.main-btn {
+            padding: 14px;
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: 600;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 1rem;
             cursor: pointer;
+            width: 100%;
+        }
+
+        button.main-btn.cancel-mode {
+            background-color: var(--surface-color);
+            color: var(--danger-color);
+            margin-top: 10px;
         }
 
         /* Toast Notification */
         #toast {
             visibility: hidden;
-            min-width: 200px;
-            background-color: #333;
-            color: #fff;
+            min-width: 150px;
+            background-color: rgba(255,255,255,0.9);
+            color: #000;
+            font-weight: 500;
             text-align: center;
             border-radius: 50px;
-            padding: 12px;
+            padding: 12px 20px;
             position: fixed;
-            z-index: 1;
-            bottom: 30px;
+            z-index: 200;
+            top: 30px; /* Oben statt unten */
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             opacity: 0;
-            transition: opacity 0.3s, bottom 0.3s;
+            transition: opacity 0.3s, top 0.3s;
         }
 
         #toast.show {
             visibility: visible;
             opacity: 1;
-            bottom: 50px;
+            top: 50px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Meine Snippets</h1>
-
-    <div id="button-grid"></div>
-
-    <div class="input-area">
-        <input type="text" id="inputLabel" placeholder="Name des Buttons (z.B. IBAN)" autocomplete="off">
-        <input type="text" id="inputText" placeholder="Text zum Kopieren" autocomplete="off">
-        <button class="add-btn" onclick="addButton()">Button hinzufügen</button>
+    <div style="max-width: 600px; margin: 0 auto; width: 100%;">
+        <h1>Meine Snippets</h1>
+        <div id="list-container"></div>
     </div>
 
-    <div id="toast">In Zwischenablage kopiert!</div>
+    <div class="input-wrapper">
+        <input type="text" id="inputLabel" placeholder="Titel (z.B. IBAN)" autocomplete="off">
+        <input type="text" id="inputText" placeholder="Der geheime Text zum Kopieren" autocomplete="off">
+        
+        <div class="input-row">
+            <button id="actionBtn" class="main-btn" onclick="handleAction()">Hinzufügen</button>
+        </div>
+        <button id="cancelBtn" class="main-btn cancel-mode" onclick="resetInput()" style="display: none;">Abbrechen</button>
+    </div>
+
+    <div id="toast">Kopiert!</div>
 
     <script>
-        // App State laden
+        // Icons als SVG Strings
+        const ICON_EDIT = `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+        const ICON_DELETE = `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
+
+        // App State
         let buttons = JSON.parse(localStorage.getItem('myCopyButtons')) || [];
+        let editIndex = -1; // -1 bedeutet: Wir sind im "Hinzufügen"-Modus
 
         // Initiale Darstellung
-        renderButtons();
+        renderList();
 
-        function renderButtons() {
-            const grid = document.getElementById('button-grid');
-            grid.innerHTML = '';
+        function renderList() {
+            const container = document.getElementById('list-container');
+            container.innerHTML = '';
+
+            if(buttons.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:#555; margin-top:40px;">Noch keine Buttons erstellt.</div>';
+                return;
+            }
 
             buttons.forEach((btn, index) => {
-                const card = document.createElement('div');
-                card.className = 'copy-card';
+                const row = document.createElement('div');
+                row.className = 'item-row';
                 
-                // Klick Event zum Kopieren
-                card.onclick = (e) => {
-                    // Verhindert Kopieren, wenn man auf Löschen klickt
-                    if(e.target.classList.contains('delete-btn')) return;
-                    copyToClipboard(btn.text);
-                };
+                // 1. Der große Bereich zum Kopieren
+                const copyArea = document.createElement('div');
+                copyArea.className = 'copy-area';
+                copyArea.innerText = btn.label; // Nur Label anzeigen!
+                copyArea.onclick = () => copyToClipboard(btn.text);
 
-                const label = document.createElement('span');
-                label.className = 'btn-label';
-                label.innerText = btn.label;
+                // 2. Die Action Buttons (Bearbeiten / Löschen)
+                const actionGroup = document.createElement('div');
+                actionGroup.className = 'action-group';
 
-                const preview = document.createElement('span');
-                preview.className = 'btn-preview';
-                preview.innerText = btn.text;
+                // Bearbeiten Button
+                const editBtn = document.createElement('button');
+                editBtn.className = 'icon-btn edit-btn';
+                editBtn.innerHTML = ICON_EDIT;
+                editBtn.onclick = () => loadForEdit(index);
 
-                const delBtn = document.createElement('button');
-                delBtn.className = 'delete-btn';
-                delBtn.innerHTML = '&times;';
-                delBtn.onclick = () => deleteButton(index);
+                // Löschen Button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'icon-btn delete-btn';
+                deleteBtn.innerHTML = ICON_DELETE;
+                deleteBtn.onclick = () => deleteButton(index);
 
-                card.appendChild(delBtn);
-                card.appendChild(label);
-                card.appendChild(preview);
-                grid.appendChild(card);
+                actionGroup.appendChild(editBtn);
+                actionGroup.appendChild(deleteBtn);
+
+                row.appendChild(copyArea);
+                row.appendChild(actionGroup);
+                container.appendChild(row);
             });
         }
 
-        function addButton() {
+        // Entscheidet ob neu Hinzugefügt oder Aktualisiert wird
+        function handleAction() {
             const labelInput = document.getElementById('inputLabel');
             const textInput = document.getElementById('inputText');
-
+            
             const label = labelInput.value.trim();
             const text = textInput.value.trim();
 
             if (!label || !text) {
-                alert("Bitte Namen und Text eingeben.");
+                alert("Bitte Titel und Text eingeben.");
                 return;
             }
 
-            buttons.push({ label, text });
-            saveAndRender();
+            if (editIndex === -1) {
+                // Modus: Neu hinzufügen
+                buttons.push({ label, text });
+            } else {
+                // Modus: Bearbeiten (Update)
+                buttons[editIndex] = { label, text };
+            }
+
+            saveData();
+            resetInput();
+        }
+
+        // Lädt Daten in die Inputs zum Bearbeiten
+        function loadForEdit(index) {
+            editIndex = index;
+            document.getElementById('inputLabel').value = buttons[index].label;
+            document.getElementById('inputText').value = buttons[index].text;
             
-            // Felder leeren
-            labelInput.value = '';
-            textInput.value = '';
+            // UI anpassen
+            document.getElementById('actionBtn').innerText = "Änderung speichern";
+            document.getElementById('cancelBtn').style.display = 'block';
+            document.getElementById('inputLabel').focus();
+        }
+
+        // Setzt Inputs und Modus zurück
+        function resetInput() {
+            editIndex = -1;
+            document.getElementById('inputLabel').value = '';
+            document.getElementById('inputText').value = '';
+            
+            // UI zurücksetzen
+            document.getElementById('actionBtn').innerText = "Hinzufügen";
+            document.getElementById('cancelBtn').style.display = 'none';
         }
 
         function deleteButton(index) {
-            if(confirm('Diesen Button wirklich löschen?')) {
+            if(confirm('Löschen?')) {
                 buttons.splice(index, 1);
-                saveAndRender();
+                // Falls wir gerade diesen Button bearbeiten wollten, resetten
+                if(index === editIndex) resetInput();
+                saveData();
             }
         }
 
-        function saveAndRender() {
+        function saveData() {
             localStorage.setItem('myCopyButtons', JSON.stringify(buttons));
-            renderButtons();
+            renderList();
         }
 
         async function copyToClipboard(text) {
@@ -257,16 +335,14 @@
                 await navigator.clipboard.writeText(text);
                 showToast();
             } catch (err) {
-                // Fallback für ältere Browser, falls nötig, aber navigator API ist Standard heute
                 console.error('Fehler beim Kopieren: ', err);
-                alert('Konnte nicht kopieren. Berechtigungen prüfen.');
             }
         }
 
         function showToast() {
             const toast = document.getElementById("toast");
             toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1500);
         }
     </script>
 </body>
