@@ -2,606 +2,356 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SafeSpace</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SafeSpace">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Rechnung V37</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <style>
-        :root {
-            --bg-color: #000000;
-            --surface-color: #1C1C1E;
-            --modal-bg: #2C2C2E;
-            --input-bg: #3A3A3C;
-            --btn-bg: #2C2C2E; 
-            --btn-text: #A0A0A0;
-            --list-text: #B0B0B0;
-            --accent-color: #0A84FF;
-            --danger-color: #FF453A;
-            --separator: #38383A;
-        }
-
+        /* --- DARK MINIMALIST UI --- */
         body {
-            background-color: var(--bg-color);
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 20px 20px 120px 20px; 
-            min-height: 100vh;
-            box-sizing: border-box;
+            background: #121212;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+            align-items: center;
+            font-size: 14px;
         }
 
-        h1 {
-            font-weight: 600;
-            margin: 10px 0 25px 0;
-            font-size: 1.1rem;
-            text-align: center;
+        /* --- COCKPIT --- */
+        .cockpit {
+            width: 100%;
+            background: #1e1e1e;
+            padding: 12px 15px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #333;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .header-row {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+        }
+        .app-lbl { font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px; color: #888; }
+
+        /* BUTTONS */
+        .btn-action {
+            background: #333; 
+            color: #eee;
+            border: 1px solid #444; 
+            width: 100%; padding: 10px; border-radius: 6px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+        .btn-action:active {
+            background: #252525; 
+            border-color: #555;
+            transform: scale(0.98);
+            color: #fff;
+        }
+
+        .btn-compact { padding: 8px; font-size: 0.8rem; }
+        .btn-icon { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0; color: #ccc; }
+
+        /* INPUTS */
+        .step-label {
+            font-size: 0.7rem; text-transform: uppercase; color: #666; font-weight: bold;
+            margin-bottom: 4px; display: block; margin-top: 8px;
+        }
+
+        .addr-box {
+            background: #252525; border: 1px solid #333; border-radius: 6px;
+            padding: 8px; margin-bottom: 8px;
+        }
+        textarea.inp-addr {
+            width: 100%; border: none; background: transparent; 
+            font-family: inherit; font-size: 0.9rem; resize: none; outline: none;
+            min-height: 60px; color: #eee; line-height: 1.3;
+        }
+        textarea::placeholder { color: #555; }
+
+        .meta-row { display: flex; gap: 8px; margin-top: 8px; }
+        .inp-small {
+            background: #252525; border: 1px solid #333; padding: 6px 10px; border-radius: 6px;
+            width: 100%; box-sizing: border-box; font-family: inherit; color: #fff; font-size: 0.85rem;
+        }
+
+        /* --- ERGEBNIS --- */
+        #resultArea {
+            padding: 15px; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box;
+        }
+        #finalImage {
+            max-width: 100%; border-radius: 2px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: none; border: 1px solid #333;
+        }
+        .status-msg { color: #666; font-size: 0.8rem; margin-top: 20px; text-align: center; }
+
+        /* --- VORLAGE (A4 Weiß) --- */
+        #invoiceTemplate {
+            position: fixed; left: -9999px; top: 0;
+            width: 794px; height: 1123px; /* A4 */
+            background: white; color: black;
+            box-sizing: border-box; padding: 50px 60px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            display: flex; flex-direction: column;
+        }
+
+        .tpl-header { 
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 40px; 
+        }
+        .tpl-shop { font-size: 28px; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+        .tpl-slogan { font-size: 13px; color: #555; }
+        .tpl-meta { text-align: right; font-size: 13px; line-height: 1.6; color: #000; }
+
+        .tpl-address-block { margin-bottom: 40px; margin-top: 10px; }
+        .tpl-sender { font-size: 10px; text-decoration: underline; color: #666; margin-bottom: 10px; }
+        .tpl-addr { 
+            font-size: 14px; font-weight: normal; line-height: 1.5; 
+            white-space: pre-wrap; height: 100px; display: block; color: #000;
+        }
+
+        .tpl-title { font-size: 32px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid black; padding-bottom: 10px; }
+
+        /* TABELLE STYLE */
+        .tpl-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+        
+        /* Überschriften: Standard Links, aber .r explizit Rechts */
+        .tpl-table th { 
+            text-align: left; 
+            border-bottom: 1px solid #000; 
+            padding: 8px 0; 
+            font-size: 11px; 
+            text-transform: uppercase; 
             color: #444; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
+        /* DER FIX: Überschriften mit Klasse 'r' müssen rechtsbündig sein */
+        .tpl-table th.r { text-align: right; }
 
-        /* --- LISTE --- */
-        #list-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .item-row {
-            display: flex;
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            overflow: hidden;
-            height: 60px; /* Feste Höhe für Einheitlichkeit */
-        }
-
-        /* Linker Bereich (Icon + Text) */
-        .content-area {
-            flex-grow: 1;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .content-area:active { background-color: #2c2c2e; }
-
-        .type-icon {
-            width: 20px;
-            height: 20px;
-            fill: #555;
-            flex-shrink: 0;
-        }
-
-        .item-label {
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--list-text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Rechter Bereich (Buttons) */
-        .action-group {
-            display: flex;
-            border-left: 1px solid var(--separator);
-        }
-
-        .icon-btn {
-            background: transparent;
-            border: none;
-            width: 50px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 0;
-        }
-        .icon-btn svg { width: 18px; height: 18px; fill: #555; }
-        .edit-btn:active, .delete-btn:active { background-color: #333; }
-        .delete-btn svg { fill: #cf6679; }
-
-        /* --- BOTTOM BAR --- */
-        .bottom-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            padding: 0 20px 30px 20px;
-            background: linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0));
-            pointer-events: none; 
-            display: flex;
-            justify-content: center;
-            z-index: 100;
-        }
-
-        .main-btn {
-            pointer-events: auto;
-            padding: 12px 24px;
-            background-color: var(--btn-bg);
-            color: var(--btn-text);
-            font-weight: 500;
-            border: 1px solid #333;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.1s;
-        }
-        .main-btn:active { transform: scale(0.95); background-color: #3a3a3c; }
-
-        /* --- MODAL (Hinzufügen) --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.2s;
-        }
-        .modal-overlay.show { opacity: 1; visibility: visible; }
-
-        .modal-box {
-            background-color: var(--modal-bg);
-            padding: 25px;
-            border-radius: 18px;
-            width: 85%;
-            max-width: 320px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            border: 1px solid #333;
-        }
-
-        .modal-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #bbb;
-        }
-
-        /* Tabs für Text/Bild */
-        .type-switch {
-            display: flex;
-            background-color: var(--input-bg);
-            border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 15px;
-        }
-        .switch-opt {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            font-size: 0.85rem;
-            color: #888;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .switch-opt.active {
-            background-color: #555;
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .modal-input, .modal-textarea {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--input-bg);
-            border: 1px solid transparent;
-            border-radius: 10px;
-            color: #ddd;
-            font-size: 0.95rem;
-            box-sizing: border-box;
-            font-family: inherit;
-            resize: none;
-            margin-bottom: 15px;
-        }
-        .modal-input:focus, .modal-textarea:focus { outline: none; background-color: #444; }
-        .modal-textarea { min-height: 90px; }
-
-        /* File Upload Styling */
-        .file-upload-wrapper {
-            position: relative;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .file-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #444;
-            color: #ccc;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        #imagePreview {
-            display: block;
-            max-width: 100%;
-            max-height: 150px;
-            margin: 15px auto 0 auto;
-            border-radius: 8px;
-            object-fit: contain;
-            display: none;
-        }
-
-        .modal-actions { display: flex; gap: 10px; }
-        .modal-actions button {
-            flex: 1; padding: 12px; border-radius: 10px; border: none;
-            font-size: 0.9rem; font-weight: 500; cursor: pointer;
-        }
-        .btn-cancel { background-color: transparent; color: var(--danger-color); }
-        .btn-save { background-color: #444; color: #fff; }
-
-        /* --- IMAGE VIEWER MODAL --- */
-        #imgViewerOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.3s;
-        }
-        #imgViewerOverlay.show { opacity: 1; visibility: visible; }
+        .tpl-table td { padding: 10px 0; border-bottom: 1px solid #ddd; font-size: 13px; }
         
-        #fullImage {
-            max-width: 100%;
-            max-height: 80%;
-            object-fit: contain;
-        }
-        
-        .viewer-actions {
-            position: absolute;
-            bottom: 40px;
-            display: flex;
-            gap: 20px;
-        }
-        .viewer-btn {
-            background-color: #333;
-            color: white;
-            border: 1px solid #444;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
+        /* Zellen Rechtsbündig */
+        .r { text-align: right; }
 
-        /* Toast */
-        #toast {
-            visibility: hidden; min-width: 100px;
-            background-color: #222; color: #ccc; text-align: center;
-            border-radius: 50px; padding: 8px 16px;
-            position: fixed; z-index: 3000; top: 15px;
-            left: 50%; transform: translateX(-50%);
-            font-size: 12px; opacity: 0; transition: opacity 0.3s, top 0.3s;
-            border: 1px solid #333;
-        }
-        #toast.show { visibility: visible; opacity: 1; top: 35px; }
+        .tpl-total td { border-top: 2px solid #000; font-size: 16px; font-weight: bold; padding-top: 12px; border-bottom: none; }
+        
+        .tpl-text { margin-top: 15px; font-size: 13px; line-height: 1.4; white-space: pre-wrap; }
+        .tpl-note { margin-top: 15px; background: #f0f0f0; padding: 12px; font-size: 12px; color: #333; border-radius: 4px; }
+        
+        .spacer { flex: 1; }
+        .tpl-footer { text-align: center; font-size: 10px; color: #777; border-top: 1px solid #ccc; padding-top: 12px; margin-top: 10px; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center;}
+        .modal-box { background:#222; padding:20px; border-radius:10px; width:85%; max-width:300px; border: 1px solid #444; color: #eee; }
+        .m-inp { width:100%; padding:8px; margin-bottom:10px; border:1px solid #444; border-radius:6px; box-sizing:border-box; background:#333; color: white; font-size: 0.85rem;}
+        .m-lbl { font-size:0.7rem; font-weight:bold; color:#888; margin-bottom:4px; display:block; text-transform:uppercase; }
+
     </style>
 </head>
 <body>
 
-    <h1>SafeSpace</h1>
-    
-    <div id="list-container"></div>
+    <div class="cockpit">
+        <div class="header-row">
+            <span class="app-lbl">RECHNUNG V37</span>
+            <button onclick="document.getElementById('settingsModal').style.display='flex'" class="btn-icon">⚙️</button>
+        </div>
 
-    <div class="bottom-bar">
-        <button class="main-btn" onclick="openAddModal()">Neues Element</button>
+        <span class="step-label">1. Lagerdaten</span>
+        <button class="btn-action" onclick="importSalesData()">
+            📦 Einfügen
+        </button>
+
+        <span class="step-label">2. Adresse</span>
+        <div class="addr-box">
+            <textarea id="addrInput" class="inp-addr" placeholder="Adresse einfügen..." oninput="regeneratePreview()"></textarea>
+        </div>
+        <button class="btn-action btn-compact" onclick="pasteAddress()">
+            📋 Adresse aus Clipboard
+        </button>
+
+        <div class="meta-row">
+            <input type="number" id="inpShip" class="inp-small" placeholder="Versand €" value="0" oninput="regeneratePreview()">
+            <input type="text" id="inpDate" class="inp-small" readonly placeholder="Datum">
+        </div>
     </div>
 
-    <div id="modalOverlay" class="modal-overlay">
+    <div id="resultArea">
+        <div id="statusMsg" class="status-msg">
+            Bild erscheint hier...
+        </div>
+        <img id="finalImage" alt="Rechnung">
+    </div>
+
+    <div id="invoiceTemplate">
+        <div class="tpl-header">
+            <div>
+                <div class="tpl-shop" id="tShop">SHOP NAME</div>
+                <div class="tpl-slogan" id="tSlogan"></div>
+            </div>
+            
+            <div class="tpl-meta">
+                Rechnungsnr.: <span id="tNr">-</span><br>
+                Rechnungsdatum: <span id="tDate">-</span><br>
+                Lieferdatum: <span id="tDel">-</span>
+            </div>
+        </div>
+
+        <div class="tpl-address-block">
+            <div class="tpl-sender" id="tSender">Absenderzeile</div>
+            <div class="tpl-addr" id="tAddr"></div>
+        </div>
+
+        <div class="tpl-title">Rechnung</div>
+
+        <table class="tpl-table">
+            <thead>
+                <tr>
+                    <th width="5%">#</th>
+                    <th>Artikel</th>
+                    <th class="r" width="10%">Mge.</th>
+                    <th class="r" width="20%">Einzel</th>
+                    <th class="r" width="20%">Gesamt</th>
+                </tr>
+            </thead>
+            <tbody id="tBody"></tbody>
+            <tfoot>
+                <tr class="tpl-total">
+                    <td colspan="4" class="r">Gesamtbetrag</td>
+                    <td class="r" id="tTotal">0,00 €</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="tpl-text" id="tFree"></div>
+        <div class="tpl-note" id="tNote" style="display:none"></div>
+        
+        <div class="spacer"></div>
+
+        <div class="tpl-footer" id="tFooter">Footer</div>
+    </div>
+
+    <div id="settingsModal" class="modal">
         <div class="modal-box">
-            <div id="modalTitle" class="modal-title">Neu</div>
-            
-            <div class="type-switch">
-                <div id="tabText" class="switch-opt active" onclick="switchTab('text')">Text</div>
-                <div id="tabImage" class="switch-opt" onclick="switchTab('image')">Bild</div>
-            </div>
-
-            <input type="text" id="modalLabel" class="modal-input" placeholder="Titel" autocomplete="off">
-            
-            <div id="textSection">
-                <textarea id="modalText" class="modal-textarea" placeholder="Text Inhalt"></textarea>
-            </div>
-
-            <div id="imageSection" style="display: none;">
-                <div class="file-upload-wrapper">
-                    <label for="fileInput" class="file-btn">Bild auswählen</label>
-                    <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
-                    <img id="imagePreview" src="" alt="Vorschau">
-                </div>
-            </div>
-
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
-                <button id="modalSaveBtn" class="btn-save" onclick="handleSave()">Speichern</button>
-            </div>
+            <h3 style="margin-top:0; font-size:1rem;">Einstellungen</h3>
+            <span class="m-lbl">Shop Name</span><input class="m-inp" id="cfgShop" oninput="saveCfg()">
+            <span class="m-lbl">Slogan</span><input class="m-inp" id="cfgSlogan" oninput="saveCfg()">
+            <span class="m-lbl">Absenderzeile</span><input class="m-inp" id="cfgSender" oninput="saveCfg()">
+            <span class="m-lbl">Footer</span><textarea class="m-inp" id="cfgFooter" rows="3" oninput="saveCfg()"></textarea>
+            <span class="m-lbl">Freitext</span><textarea class="m-inp" id="cfgFree" rows="2" oninput="saveCfg()"></textarea>
+            <button class="btn-action" onclick="document.getElementById('settingsModal').style.display='none'; regeneratePreview()">Fertig</button>
         </div>
     </div>
-
-    <div id="imgViewerOverlay">
-        <img id="fullImage" src="">
-        <div class="viewer-actions">
-            <button class="viewer-btn" onclick="closeImageViewer()">Schließen</button>
-            <button class="viewer-btn" style="background-color: #0A84FF;" onclick="shareImage()">Teilen / Sichern</button>
-        </div>
-    </div>
-
-    <div id="toast">Info</div>
 
     <script>
-        // --- ICONS ---
-        const ICON_TEXT = `<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
-        const ICON_IMAGE = `<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
-        const ICON_DELETE = `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
+        let currentData = { items: [] };
 
-        // --- DATABASE HELPERS (IndexedDB Wrapper) ---
-        const DB_NAME = 'SafeSpaceDB';
-        const STORE_NAME = 'items';
+        // INIT
+        document.getElementById('inpDate').value = new Date().toLocaleDateString('de-DE');
 
-        const dbPromise = new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, 1);
-            request.onupgradeneeded = (e) => {
-                e.target.result.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-            };
-            request.onsuccess = (e) => resolve(e.target.result);
-            request.onerror = (e) => reject(e);
+        const fields = ['cfgShop', 'cfgSlogan', 'cfgSender', 'cfgFooter', 'cfgFree'];
+        fields.forEach(f => {
+            const val = localStorage.getItem(f);
+            if(val) document.getElementById(f).value = val;
         });
+        if(!document.getElementById('cfgShop').value) document.getElementById('cfgShop').value = "Mein Shop";
+        if(!document.getElementById('cfgFree').value) document.getElementById('cfgFree').value = "Vielen Dank für Ihren Einkauf.";
 
-        async function getAllItems() {
-            const db = await dbPromise;
-            return new Promise((resolve) => {
-                const tx = db.transaction(STORE_NAME, 'readonly');
-                const store = tx.objectStore(STORE_NAME);
-                const req = store.getAll();
-                req.onsuccess = () => resolve(req.result || []);
-            });
+        function saveCfg() {
+            fields.forEach(f => localStorage.setItem(f, document.getElementById(f).value));
         }
 
-        async function addItem(item) {
-            const db = await dbPromise;
-            return new Promise((resolve) => {
-                const tx = db.transaction(STORE_NAME, 'readwrite');
-                tx.objectStore(STORE_NAME).add(item);
-                tx.oncomplete = () => resolve();
-            });
-        }
-
-        async function deleteItem(id) {
-            const db = await dbPromise;
-            return new Promise((resolve) => {
-                const tx = db.transaction(STORE_NAME, 'readwrite');
-                tx.objectStore(STORE_NAME).delete(id);
-                tx.oncomplete = () => resolve();
-            });
-        }
-
-        // --- APP LOGIC ---
-        let currentMode = 'text'; // 'text' or 'image'
-        let currentImageBase64 = null;
-        let activeItems = [];
-
-        // Init
-        loadList();
-
-        async function loadList() {
-            activeItems = await getAllItems();
-            renderList();
-        }
-
-        function renderList() {
-            const container = document.getElementById('list-container');
-            container.innerHTML = '';
-
-            if(activeItems.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:#333; font-size: 0.8rem; margin-top:40px;">Leer</div>';
-                return;
-            }
-
-            activeItems.forEach((item) => {
-                const row = document.createElement('div');
-                row.className = 'item-row';
-                
-                // Content Click Area
-                const content = document.createElement('div');
-                content.className = 'content-area';
-                
-                // Icon
-                const icon = document.createElement('div');
-                icon.className = 'type-icon';
-                icon.innerHTML = item.type === 'image' ? ICON_IMAGE : ICON_TEXT;
-
-                // Label
-                const label = document.createElement('div');
-                label.className = 'item-label';
-                label.innerText = item.label;
-
-                content.appendChild(icon);
-                content.appendChild(label);
-
-                // Click Action
-                content.onclick = () => {
-                    if (item.type === 'text') {
-                        copyToClipboard(item.content);
-                    } else {
-                        openImageViewer(item.content);
-                    }
-                };
-
-                // Action Group (Only Delete for minimalism)
-                const actionGroup = document.createElement('div');
-                actionGroup.className = 'action-group';
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'icon-btn delete-btn';
-                deleteBtn.innerHTML = ICON_DELETE;
-                deleteBtn.onclick = () => handleDelete(item.id);
-
-                actionGroup.appendChild(deleteBtn);
-                row.appendChild(content);
-                row.appendChild(actionGroup);
-                container.appendChild(row);
-            });
-        }
-
-        // --- MODAL LOGIC ---
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalLabel = document.getElementById('modalLabel');
-        const modalText = document.getElementById('modalText');
-        const imagePreview = document.getElementById('imagePreview');
-        const fileInput = document.getElementById('fileInput');
-
-        function openAddModal() {
-            // Reset
-            modalLabel.value = '';
-            modalText.value = '';
-            fileInput.value = '';
-            imagePreview.src = '';
-            imagePreview.style.display = 'none';
-            currentImageBase64 = null;
-            switchTab('text');
-            
-            modalOverlay.classList.add('show');
-            setTimeout(() => modalLabel.focus(), 50);
-        }
-
-        function closeModal() {
-            modalOverlay.classList.remove('show');
-        }
-
-        function switchTab(mode) {
-            currentMode = mode;
-            document.getElementById('tabText').className = `switch-opt ${mode === 'text' ? 'active' : ''}`;
-            document.getElementById('tabImage').className = `switch-opt ${mode === 'image' ? 'active' : ''}`;
-            
-            document.getElementById('textSection').style.display = mode === 'text' ? 'block' : 'none';
-            document.getElementById('imageSection').style.display = mode === 'image' ? 'block' : 'none';
-        }
-
-        function handleFileSelect(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentImageBase64 = e.target.result;
-                    imagePreview.src = currentImageBase64;
-                    imagePreview.style.display = 'block';
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        async function handleSave() {
-            const label = modalLabel.value.trim();
-            
-            if (!label) {
-                alert("Bitte einen Titel eingeben.");
-                return;
-            }
-
-            let newItem = { label: label, type: currentMode };
-
-            if (currentMode === 'text') {
-                const text = modalText.value.trim();
-                if (!text) return;
-                newItem.content = text;
-            } else {
-                if (!currentImageBase64) {
-                    alert("Bitte ein Bild auswählen.");
-                    return;
-                }
-                newItem.content = currentImageBase64;
-            }
-
-            await addItem(newItem);
-            loadList(); // Reload from DB
-            closeModal();
-        }
-
-        async function handleDelete(id) {
-            if(confirm('Löschen?')) {
-                await deleteItem(id);
-                loadList();
-            }
-        }
-
-        // --- ACTIONS ---
-        async function copyToClipboard(text) {
+        async function importSalesData() {
             try {
-                await navigator.clipboard.writeText(text);
-                showToast("Kopiert!");
-            } catch (err) {
-                // Fallback method
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                textArea.style.position = "fixed";
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showToast("Kopiert!");
-                } catch (e) {}
-                document.body.removeChild(textArea);
-            }
-        }
+                const text = await navigator.clipboard.readText();
+                if(!text.trim().startsWith('{')) { alert('Keine Lager-Daten erkannt.'); return; }
+                const json = JSON.parse(text);
+                currentData = json;
 
-        // --- IMAGE VIEWER ---
-        const imgViewer = document.getElementById('imgViewerOverlay');
-        const fullImage = document.getElementById('fullImage');
-        let currentViewingImage = null;
+                // Rechnungsnr
+                if(json.invoiceNr) document.getElementById('tNr').innerText = json.invoiceNr;
+                
+                // Datum logic
+                let d = json.date;
+                if(d && !d.includes('.')) d = new Date(d).toLocaleDateString('de-DE');
+                if(!d) d = new Date().toLocaleDateString('de-DE');
+                
+                document.getElementById('tDate').innerText = d;
+                document.getElementById('tDel').innerText = d; 
+                document.getElementById('inpDate').value = d;
 
-        function openImageViewer(base64Data) {
-            currentViewingImage = base64Data;
-            fullImage.src = base64Data;
-            imgViewer.classList.add('show');
-        }
-
-        function closeImageViewer() {
-            imgViewer.classList.remove('show');
-            setTimeout(() => { fullImage.src = ''; }, 300);
-        }
-
-        async function shareImage() {
-            if (!currentViewingImage) return;
-
-            // Convert Base64 back to Blob for Sharing
-            const res = await fetch(currentViewingImage);
-            const blob = await res.blob();
-            const file = new File([blob], "image.png", { type: "image/png" });
-
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        files: [file]
-                    });
-                    showToast("Erfolg!");
-                } catch (err) {
-                    console.log("Teilen abgebrochen");
+                if(json.platform) {
+                    document.getElementById('tNote').style.display = 'block';
+                    document.getElementById('tNote').innerText = "Verkauf über " + json.platform;
+                } else {
+                    document.getElementById('tNote').style.display = 'none';
                 }
-            } else {
-                alert("Teilen wird von diesem Browser nicht unterstützt. Bitte Screenshot machen.");
-            }
+
+                if(json.shipping) document.getElementById('inpShip').value = json.shipping;
+                regeneratePreview();
+            } catch (err) { alert('Fehler: ' + err); }
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById("toast");
-            toast.innerText = msg;
-            toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1000);
+        async function pasteAddress() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('addrInput').value = text;
+                regeneratePreview(); 
+            } catch (err) { alert('Clipboard Fehler: ' + err); }
+        }
+
+        function regeneratePreview() {
+            // Config
+            document.getElementById('tShop').innerText = document.getElementById('cfgShop').value;
+            document.getElementById('tSlogan').innerText = document.getElementById('cfgSlogan').value;
+            document.getElementById('tSender').innerText = document.getElementById('cfgSender').value;
+            document.getElementById('tFooter').innerHTML = document.getElementById('cfgFooter').value.replace(/\n/g, '<br>');
+            document.getElementById('tFree').innerText = document.getElementById('cfgFree').value;
+            document.getElementById('tAddr').innerText = document.getElementById('addrInput').value;
+
+            // Tabelle
+            const tbody = document.getElementById('tBody');
+            tbody.innerHTML = '';
+            let total = 0;
+            let pos = 1;
+
+            (currentData.items || []).forEach(item => {
+                const price = parseFloat(item.priceTotal);
+                total += price;
+                let desc = item.name;
+                if(item.artnr) desc = `<b>${item.artnr}</b> ${desc}`;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${pos++}</td><td>${desc}</td><td class="r">${item.qty}</td><td class="r">${(price/item.qty).toFixed(2).replace('.',',')} €</td><td class="r">${price.toFixed(2).replace('.',',')} €</td>`;
+                tbody.appendChild(tr);
+            });
+
+            // Versand
+            const ship = parseFloat(document.getElementById('inpShip').value) || 0;
+            if(ship > 0) {
+                total += ship;
+                tbody.innerHTML += `<tr><td>${pos}</td><td>Versand</td><td class="r">1</td><td class="r">${ship.toFixed(2).replace('.',',')} €</td><td class="r">${ship.toFixed(2).replace('.',',')} €</td></tr>`;
+            }
+
+            document.getElementById('tTotal').innerText = total.toFixed(2).replace('.',',') + ' €';
+            generateImage();
+        }
+
+        function generateImage() {
+            const el = document.getElementById('invoiceTemplate');
+            const img = document.getElementById('finalImage');
+            const msg = document.getElementById('statusMsg');
+
+            msg.innerText = "...";
+            img.style.opacity = '0.3';
+
+            html2canvas(el, { scale: 2 }).then(canvas => {
+                img.src = canvas.toDataURL("image/jpeg", 0.9);
+                img.style.display = 'block';
+                img.style.opacity = '1';
+                msg.style.display = 'none';
+            });
         }
     </script>
 </body>
