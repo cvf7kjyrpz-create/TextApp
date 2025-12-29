@@ -15,21 +15,19 @@
             --surface-color: #1C1C1E;
             --modal-bg: #2C2C2E;
             --input-bg: #3A3A3C;
-            --text-primary: #FFFFFF;
-            --text-secondary: #EBEBF599;
-            /* Der neue dezente Button Style */
-            --btn-bg: #3A3A3C; 
-            --btn-text: #B0B0B0; 
+            --btn-bg: #2C2C2E; 
+            --btn-text: #A0A0A0; /* Helles Grau für den Button-Text */
+            --list-text: #999999; /* Helles Grau für die Snippets */
             --danger-color: #FF453A;
             --separator: #38383A;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-primary);
+            color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 20px 20px 100px 20px; 
+            padding: 20px 20px 120px 20px; 
             min-height: 100vh;
             box-sizing: border-box;
         }
@@ -37,9 +35,9 @@
         h1 {
             font-weight: 600;
             margin: 10px 0 25px 0;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             text-align: center;
-            color: #555; /* Sehr dezente Überschrift */
+            color: #444; 
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -66,7 +64,8 @@
             padding: 16px 20px;
             font-size: 1rem;
             font-weight: 500;
-            color: #E0E0E0;
+            /* HIER: Die gewünschte hellgraue Schrift */
+            color: var(--list-text);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -83,62 +82,60 @@
         .icon-btn {
             background: transparent;
             border: none;
-            width: 44px; /* Etwas schmaler */
+            width: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             padding: 0;
         }
-        .icon-btn svg { width: 18px; height: 18px; fill: #666; } /* Dezentere Icons */
+        .icon-btn svg { width: 18px; height: 18px; fill: #555; }
         .edit-btn:active { background-color: #333; }
         .delete-btn:active { background-color: #333; }
         .delete-btn svg { fill: #cf6679; }
 
-        /* Der untere Bereich */
+        /* Der untere Bereich - Jetzt absolut zentriert */
         .bottom-bar {
             position: fixed;
             bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px;
-            /* Transparenter Verlauf statt harter Kante */
+            left: 0; 
+            right: 0; /* Wichtig für Zentrierung */
+            padding: 0 20px 30px 20px; /* Padding unten etwas höher für iPhones ohne Home Button */
             background: linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0));
-            pointer-events: none; /* Klicks gehen durch den leeren Bereich durch */
+            pointer-events: none; 
             display: flex;
-            justify-content: center;
+            justify-content: center; /* Flexbox Zentrierung */
+            align-items: flex-end;
+            z-index: 100;
         }
 
-        /* Der Haupt-Button: Schmaler, dezenter, Hellgrau */
         .main-btn {
-            pointer-events: auto; /* Button wieder klickbar machen */
-            padding: 10px 20px; /* Weniger Padding (schmaler) */
+            pointer-events: auto;
+            padding: 12px 24px;
             background-color: var(--btn-bg);
             color: var(--btn-text);
             font-weight: 500;
-            border: none;
-            border-radius: 30px; /* Pill-Shape */
+            border: 1px solid #333; /* Dezenter Rahmen */
+            border-radius: 30px;
             font-size: 0.9rem;
             cursor: pointer;
-            width: auto; /* Nicht mehr volle Breite */
-            min-width: 180px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: transform 0.1s;
         }
         
         .main-btn:active {
-            transform: scale(0.96);
-            background-color: #4a4a4c;
-            color: #fff;
+            transform: scale(0.95);
+            background-color: #3a3a3c;
+            color: #ccc;
         }
 
-        /* --- MODAL STYLES --- */
+        /* --- MODAL --- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -155,16 +152,17 @@
             padding: 25px;
             border-radius: 18px;
             width: 85%;
-            max-width: 350px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            max-width: 320px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border: 1px solid #333;
         }
 
         .modal-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             margin-bottom: 20px;
             text-align: center;
-            color: #ddd;
+            color: #bbb;
         }
 
         .modal-input-group {
@@ -179,53 +177,53 @@
             padding: 12px;
             background-color: var(--input-bg);
             border: 1px solid transparent;
-            border-radius: 8px;
-            color: white;
+            border-radius: 10px;
+            color: #ddd;
             font-size: 0.95rem;
             box-sizing: border-box;
             font-family: inherit;
             resize: none;
         }
-        .modal-textarea { min-height: 80px; }
         .modal-input:focus, .modal-textarea:focus {
-            border-color: #555;
             outline: none;
+            background-color: #444;
         }
+        .modal-textarea { min-height: 90px; }
 
         .modal-actions { display: flex; gap: 10px; }
 
         .modal-actions button {
             flex: 1;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             border: none;
             font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
         }
         .btn-cancel { background-color: transparent; color: var(--danger-color); }
-        .btn-save { background-color: #444; color: white; }
+        .btn-save { background-color: #444; color: #fff; }
 
         /* Toast */
         #toast {
             visibility: hidden;
-            min-width: 120px;
-            background-color: #333;
-            color: #fff;
+            min-width: 100px;
+            background-color: #222;
+            color: #ccc;
             text-align: center;
             border-radius: 50px;
-            padding: 10px 20px;
+            padding: 8px 16px;
             position: fixed;
             z-index: 2000;
-            top: 20px;
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 13px;
+            font-size: 12px;
             opacity: 0;
             transition: opacity 0.3s, top 0.3s;
-            border: 1px solid #444;
+            border: 1px solid #333;
         }
-        #toast.show { visibility: visible; opacity: 1; top: 40px; }
+        #toast.show { visibility: visible; opacity: 1; top: 35px; }
     </style>
 </head>
 <body>
@@ -276,7 +274,7 @@
             container.innerHTML = '';
 
             if(buttons.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:#444; font-size: 0.9rem; margin-top:40px;">Noch keine Einträge.</div>';
+                container.innerHTML = '<div style="text-align:center; color:#333; font-size: 0.8rem; margin-top:40px;">Liste ist leer</div>';
                 return;
             }
 
@@ -343,10 +341,7 @@
             const label = modalLabel.value.trim();
             const text = modalText.value.trim();
 
-            if (!label || !text) {
-                // Kurzes Wackeln oder einfach nichts tun wäre besser als Alert
-                return;
-            }
+            if (!label || !text) return;
 
             if (editIndex === -1) {
                 buttons.push({ label, text });
@@ -359,9 +354,7 @@
         }
 
         function deleteButton(index) {
-            // Kein Confirm mehr für schnelleren Workflow, oder sehr dezent?
-            // User wollte minimalistisch. Ein Confirm ist sicherer.
-            if(confirm('Entfernen?')) {
+            if(confirm('Löschen?')) {
                 buttons.splice(index, 1);
                 saveData();
             }
@@ -377,7 +370,6 @@
                 await navigator.clipboard.writeText(text);
                 showToast();
             } catch (err) {
-                // Fallback
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
                 textArea.style.position = "fixed";
@@ -394,7 +386,7 @@
         function showToast() {
             const toast = document.getElementById("toast");
             toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1200);
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1000);
         }
     </script>
 </body>
