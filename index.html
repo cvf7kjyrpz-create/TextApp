@@ -17,7 +17,9 @@
             --input-bg: #3A3A3C;
             --text-primary: #FFFFFF;
             --text-secondary: #EBEBF599;
-            --button-color: #48484A; /* Neutrales Grau statt Blau */
+            /* Der neue dezente Button Style */
+            --btn-bg: #3A3A3C; 
+            --btn-text: #B0B0B0; 
             --danger-color: #FF453A;
             --separator: #38383A;
         }
@@ -27,22 +29,21 @@
             color: var(--text-primary);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            /* Padding unten für den fixierten Button-Bereich */
             padding: 20px 20px 100px 20px; 
             min-height: 100vh;
             box-sizing: border-box;
         }
 
-        /* Überschrift kleiner */
         h1 {
             font-weight: 600;
             margin: 10px 0 25px 0;
-            font-size: 1.3rem; /* Deutlich kleiner */
+            font-size: 1.2rem;
             text-align: center;
-            color: var(--text-secondary);
+            color: #555; /* Sehr dezente Überschrift */
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Container für die Liste */
         #list-container {
             width: 100%;
             max-width: 600px;
@@ -52,26 +53,27 @@
             gap: 12px;
         }
 
-        /* Listenelement Style (wie vorher) */
         .item-row {
             display: flex;
             background-color: var(--surface-color);
-            border-radius: 14px;
+            border-radius: 12px;
             overflow: hidden;
+            transition: background-color 0.2s;
         }
 
         .copy-area {
             flex-grow: 1;
-            padding: 18px 20px;
-            font-size: 1.1rem;
+            padding: 16px 20px;
+            font-size: 1rem;
             font-weight: 500;
+            color: #E0E0E0;
             cursor: pointer;
             display: flex;
             align-items: center;
             user-select: none; 
             -webkit-tap-highlight-color: transparent;
         }
-        .copy-area:active { background-color: #3a3a3c; }
+        .copy-area:active { background-color: #2c2c2e; }
 
         .action-group {
             display: flex;
@@ -81,170 +83,159 @@
         .icon-btn {
             background: transparent;
             border: none;
-            width: 50px;
+            width: 44px; /* Etwas schmaler */
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             padding: 0;
         }
-        .icon-btn svg { width: 20px; height: 20px; fill: var(--text-secondary); }
-        .edit-btn:active { background-color: #3a3a3c; }
-        .delete-btn:active { background-color: #3a3a3c; }
-        .delete-btn svg { fill: var(--danger-color); }
+        .icon-btn svg { width: 18px; height: 18px; fill: #666; } /* Dezentere Icons */
+        .edit-btn:active { background-color: #333; }
+        .delete-btn:active { background-color: #333; }
+        .delete-btn svg { fill: #cf6679; }
 
-        /* Fixierter unterer Bereich für den "Neu" Button */
+        /* Der untere Bereich */
         .bottom-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             padding: 20px;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-sizing: border-box;
+            /* Transparenter Verlauf statt harter Kante */
+            background: linear-gradient(to top, rgba(0,0,0,1) 20%, rgba(0,0,0,0));
+            pointer-events: none; /* Klicks gehen durch den leeren Bereich durch */
             display: flex;
             justify-content: center;
         }
 
+        /* Der Haupt-Button: Schmaler, dezenter, Hellgrau */
         .main-btn {
-            padding: 14px 24px;
-            background-color: var(--button-color);
-            color: white;
-            font-weight: 600;
+            pointer-events: auto; /* Button wieder klickbar machen */
+            padding: 10px 20px; /* Weniger Padding (schmaler) */
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            font-weight: 500;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 30px; /* Pill-Shape */
+            font-size: 0.9rem;
             cursor: pointer;
-            width: 100%;
-            max-width: 600px;
+            width: auto; /* Nicht mehr volle Breite */
+            min-width: 180px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: transform 0.1s, background-color 0.2s;
         }
-        .main-btn:active { opacity: 0.8; }
+        
+        .main-btn:active {
+            transform: scale(0.96);
+            background-color: #4a4a4c;
+            color: #fff;
+        }
 
-        /* --- MODAL (POP-UP) STYLES --- */
+        /* --- MODAL STYLES --- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s ease;
+            transition: opacity 0.2s;
         }
         
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
+        .modal-overlay.show { opacity: 1; visibility: visible; }
 
         .modal-box {
             background-color: var(--modal-bg);
             padding: 25px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transform: scale(0.95);
-            transition: all 0.3s ease;
-        }
-        .modal-overlay.show .modal-box {
-            transform: scale(1);
+            border-radius: 18px;
+            width: 85%;
+            max-width: 350px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
 
         .modal-title {
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 600;
             margin-bottom: 20px;
             text-align: center;
+            color: #ddd;
         }
 
         .modal-input-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 25px;
         }
 
         .modal-input, .modal-textarea {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background-color: var(--input-bg);
-            border: none;
-            border-radius: 10px;
+            border: 1px solid transparent;
+            border-radius: 8px;
             color: white;
-            font-size: 1rem;
+            font-size: 0.95rem;
             box-sizing: border-box;
             font-family: inherit;
-            resize: none; /* Verhindert manuelles Vergrößern */
+            resize: none;
         }
-        .modal-textarea {
-            min-height: 100px;
-        }
+        .modal-textarea { min-height: 80px; }
         .modal-input:focus, .modal-textarea:focus {
-            outline: 2px solid var(--text-secondary);
+            border-color: #555;
+            outline: none;
         }
 
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-        }
+        .modal-actions { display: flex; gap: 10px; }
 
         .modal-actions button {
             flex: 1;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 10px;
+            border-radius: 8px;
             border: none;
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 0.9rem;
+            font-weight: 500;
             cursor: pointer;
         }
-        .btn-cancel {
-            background-color: transparent;
-            color: var(--danger-color);
-        }
-        .btn-save {
-            background-color: var(--button-color);
-            color: white;
-        }
+        .btn-cancel { background-color: transparent; color: var(--danger-color); }
+        .btn-save { background-color: #444; color: white; }
 
-        /* Toast Notification */
+        /* Toast */
         #toast {
             visibility: hidden;
-            min-width: 150px;
-            background-color: rgba(255,255,255,0.9);
-            color: #000;
-            font-weight: 500;
+            min-width: 120px;
+            background-color: #333;
+            color: #fff;
             text-align: center;
             border-radius: 50px;
-            padding: 12px 20px;
+            padding: 10px 20px;
             position: fixed;
             z-index: 2000;
-            top: 30px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            font-size: 13px;
             opacity: 0;
             transition: opacity 0.3s, top 0.3s;
+            border: 1px solid #444;
         }
-        #toast.show { visibility: visible; opacity: 1; top: 50px; }
+        #toast.show { visibility: visible; opacity: 1; top: 40px; }
     </style>
 </head>
 <body>
 
     <h1>Meine Snippets</h1>
     
-    <div id="list-container">
-        </div>
+    <div id="list-container"></div>
 
     <div class="bottom-bar">
-        <button class="main-btn" onclick="openAddModal()">Neues Snippet erstellen</button>
+        <button class="main-btn" onclick="openAddModal()">Neues Snippet</button>
     </div>
 
     <div id="modalOverlay" class="modal-overlay">
@@ -252,8 +243,8 @@
             <div id="modalTitle" class="modal-title">Neues Snippet</div>
             
             <div class="modal-input-group">
-                <input type="text" id="modalLabel" class="modal-input" placeholder="Titel (z.B. IBAN)" autocomplete="off">
-                <textarea id="modalText" class="modal-textarea" placeholder="Text hier reinkopieren oder schreiben"></textarea>
+                <input type="text" id="modalLabel" class="modal-input" placeholder="Titel" autocomplete="off">
+                <textarea id="modalText" class="modal-textarea" placeholder="Text"></textarea>
             </div>
 
             <div class="modal-actions">
@@ -263,14 +254,12 @@
         </div>
     </div>
 
-    <div id="toast">Kopiert!</div>
+    <div id="toast">Kopiert</div>
 
     <script>
-        // Icons
         const ICON_EDIT = `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
         const ICON_DELETE = `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
 
-        // App State
         let buttons = JSON.parse(localStorage.getItem('myCopyButtons')) || [];
         let editIndex = -1;
         
@@ -287,7 +276,7 @@
             container.innerHTML = '';
 
             if(buttons.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:#555; margin-top:40px;">Drücke unten auf den Button um zu starten.</div>';
+                container.innerHTML = '<div style="text-align:center; color:#444; font-size: 0.9rem; margin-top:40px;">Noch keine Einträge.</div>';
                 return;
             }
 
@@ -321,8 +310,6 @@
             });
         }
 
-        // --- MODAL LOGIC ---
-
         function openAddModal() {
             editIndex = -1;
             modalTitle.innerText = "Neues Snippet";
@@ -330,31 +317,26 @@
             modalLabel.value = '';
             modalText.value = '';
             modalOverlay.classList.add('show');
-            modalLabel.focus();
+            setTimeout(() => modalLabel.focus(), 50);
         }
 
         function loadForEdit(index) {
             editIndex = index;
-            modalTitle.innerText = "Snippet bearbeiten";
-            modalSaveBtn.innerText = "Speichern";
+            modalTitle.innerText = "Bearbeiten";
+            modalSaveBtn.innerText = "OK";
             modalLabel.value = buttons[index].label;
             modalText.value = buttons[index].text;
             modalOverlay.classList.add('show');
-            // Kleiner Hack, damit der Cursor beim Bearbeiten am Ende des Textes steht
-            const val = modalText.value; 
-            modalText.value = ''; 
-            modalText.value = val;
-            modalText.focus();
+            setTimeout(() => modalText.focus(), 50);
         }
 
         function closeModal() {
             modalOverlay.classList.remove('show');
-            // Warten bis Animation vorbei ist, dann resetten
             setTimeout(() => {
                 editIndex = -1;
                 modalLabel.value = '';
                 modalText.value = '';
-            }, 300);
+            }, 200);
         }
 
         function handleModalSave() {
@@ -362,7 +344,7 @@
             const text = modalText.value.trim();
 
             if (!label || !text) {
-                alert("Bitte Titel und Text eingeben.");
+                // Kurzes Wackeln oder einfach nichts tun wäre besser als Alert
                 return;
             }
 
@@ -376,10 +358,10 @@
             closeModal();
         }
 
-        // --- CRUD & UTILS ---
-
         function deleteButton(index) {
-            if(confirm('Wirklich löschen?')) {
+            // Kein Confirm mehr für schnelleren Workflow, oder sehr dezent?
+            // User wollte minimalistisch. Ein Confirm ist sicherer.
+            if(confirm('Entfernen?')) {
                 buttons.splice(index, 1);
                 saveData();
             }
@@ -395,20 +377,16 @@
                 await navigator.clipboard.writeText(text);
                 showToast();
             } catch (err) {
-                console.error(err);
-                // Fallback für sehr alte iOS Versionen, falls nötig
+                // Fallback
                 const textArea = document.createElement("textarea");
                 textArea.value = text;
                 textArea.style.position = "fixed";
                 document.body.appendChild(textArea);
-                textArea.focus();
                 textArea.select();
                 try {
                     document.execCommand('copy');
                     showToast();
-                } catch (err) {
-                    alert('Kopieren fehlgeschlagen.');
-                }
+                } catch (err) {}
                 document.body.removeChild(textArea);
             }
         }
@@ -416,7 +394,7 @@
         function showToast() {
             const toast = document.getElementById("toast");
             toast.className = "show";
-            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1500);
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1200);
         }
     </script>
 </body>
