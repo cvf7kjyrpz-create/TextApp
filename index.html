@@ -17,7 +17,7 @@
             --input-bg: #2C2C2E;
             --btn-bg: #2C2C2E; 
             --btn-text: #A0A0A0;
-            --list-text: #C0C0C0; /* Etwas heller für bessere Lesbarkeit bei kleinerer Schrift */
+            --list-text: #C0C0C0;
             --danger-color: #FF453A;
             --success-color: #30D158;
             --separator: #38383A;
@@ -29,85 +29,84 @@
             color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            padding: 160px 15px 100px 15px; /* Seitenabstand leicht reduziert */
+            padding: 160px 15px 100px 15px; 
             min-height: 100vh;
             box-sizing: border-box;
         }
 
-        /* --- FIXED HEADER SECTION --- */
+        /* --- FIXED HEADER --- */
         .fixed-header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
+            position: fixed; top: 0; left: 0; right: 0;
             background-color: rgba(0,0,0,0.95);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            z-index: 500;
-            padding: 10px 15px 10px 15px;
-            border-bottom: 1px solid #222;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            z-index: 500; padding: 10px 15px 10px 15px; border-bottom: 1px solid #222;
         }
-
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         h1 { font-weight: 700; font-size: 1.2rem; color: #fff; margin: 0; }
         .settings-btn { background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center; }
         .settings-btn svg { width: 22px; height: 22px; fill: #0A84FF; }
 
         .search-container { margin-bottom: 10px; position: relative; }
-        .search-input {
-            width: 100%; padding: 8px 12px 8px 32px;
-            background-color: #1C1C1E; border: none; border-radius: 8px;
-            color: #fff; font-size: 0.95rem; box-sizing: border-box;
-        }
+        .search-input { width: 100%; padding: 8px 12px 8px 32px; background-color: #1C1C1E; border: none; border-radius: 8px; color: #fff; font-size: 0.95rem; box-sizing: border-box; }
         .search-input:focus { outline: none; background-color: #2c2c2e; }
-        .search-icon {
-            position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
-            width: 14px; height: 14px; fill: #777; pointer-events: none;
-        }
+        .search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; fill: #777; pointer-events: none; }
 
         .segmented-control { display: flex; background-color: #1C1C1E; border-radius: 8px; padding: 2px; }
-        .segment-btn {
-            flex: 1; background: transparent; color: #777; border: none; padding: 5px;
-            font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s;
-        }
+        .segment-btn { flex: 1; background: transparent; color: #777; border: none; padding: 5px; font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
         .segment-btn.active { background-color: #555; color: white; }
 
         /* --- COMPACT LIST --- */
         #list-container {
             width: 100%; max-width: 600px; margin: 0 auto;
-            display: flex; flex-direction: column;
-            gap: 8px; /* Abstand verringert (war 12px) */
+            display: flex; flex-direction: column; gap: 8px;
         }
 
         .item-row {
             display: flex; background-color: var(--surface-color);
-            border-radius: 10px; /* Radius angepasst */
-            overflow: hidden;
-            height: 50px; /* Höhe verringert (war 60px) */
+            border-radius: 10px; overflow: hidden;
+            /* Flexibles Layout für mehrzeiligen Text */
+            min-height: 52px; 
+            align-items: stretch;
         }
 
         .content-area {
-            flex-grow: 1; padding: 0 15px; display: flex; align-items: center;
+            flex-grow: 1; padding: 8px 15px; display: flex; align-items: center;
             gap: 12px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
         }
         .content-area:active { background-color: #2c2c2e; }
 
-        .type-icon { width: 16px; height: 16px; fill: #666; flex-shrink: 0; }
+        .type-icon { width: 16px; height: 16px; fill: #666; flex-shrink: 0; margin-top: 2px; }
         
-        .item-info { display: flex; flex-direction: column; overflow: hidden; justify-content: center; }
-        .item-label {
-            font-size: 0.95rem; /* Schrift minimal kleiner */
-            font-weight: 500; color: var(--list-text);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            line-height: 1.2;
+        .item-info { 
+            display: flex; flex-direction: column; 
+            overflow: hidden; justify-content: center; width: 100%; 
         }
-        .item-count { font-size: 0.7rem; color: #555; margin-top: 1px; }
+
+        /* --- NEUES SCHRIFT-DESIGN --- */
+        .item-label {
+            font-size: 0.85rem; /* Kleiner wie gewünscht */
+            font-weight: 500; 
+            color: var(--list-text);
+            line-height: 1.25;
+            
+            /* Logic für 2 Zeilen */
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Max 2 Zeilen */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: normal; /* Erlaubt Umbruch */
+            word-break: break-word; /* Bricht lange Wörter um */
+        }
+        
+        .item-count { font-size: 0.7rem; color: #555; margin-top: 2px; }
 
         .action-group { display: flex; border-left: 1px solid #2a2a2a; }
         .icon-btn {
-            background: transparent; border: none; width: 44px; /* Schmaler */
+            background: transparent; border: none; width: 44px;
             height: 100%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; padding: 0;
         }
-        .icon-btn svg { width: 16px; height: 16px; fill: #555; } /* Dezentere Icons */
+        .icon-btn svg { width: 16px; height: 16px; fill: #555; }
         .delete-btn:active { background-color: #333; }
         .delete-btn svg { fill: #cf6679; }
 
@@ -128,26 +127,10 @@
         .main-btn:active { transform: scale(0.95); background-color: #3a3a3c; }
 
         /* --- MODALS --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.2s;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.2s; }
         .modal-overlay.show { opacity: 1; visibility: visible; }
-
-        .modal-box {
-            background-color: var(--modal-bg); padding: 25px;
-            border-radius: 18px; width: 85%; max-width: 320px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            border: 1px solid #333; max-height: 80vh; overflow-y: auto;
-        }
-
-        .modal-title {
-            font-size: 1rem; font-weight: 600; margin-bottom: 20px;
-            text-align: center; color: #bbb;
-        }
+        .modal-box { background-color: var(--modal-bg); padding: 25px; border-radius: 18px; width: 85%; max-width: 320px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid #333; max-height: 80vh; overflow-y: auto; }
+        .modal-title { font-size: 1rem; font-weight: 600; margin-bottom: 20px; text-align: center; color: #bbb; }
 
         /* --- SETTINGS --- */
         .settings-group { background-color: #222; border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
@@ -438,7 +421,6 @@
             modalLabel.value = ''; modalText.value = ''; fileInput.value = '';
             previewGrid.innerHTML = ''; currentImages = [];
             modalSaveBtn.disabled = false; loader.style.display = 'none';
-            // Default to the tab currently visible
             switchTab(currentListFilter); 
             modalOverlay.classList.add('show');
             setTimeout(() => modalLabel.focus(), 50);
