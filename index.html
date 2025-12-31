@@ -14,10 +14,10 @@
             --bg-color: #000000;
             --surface-color: #1C1C1E;
             --modal-bg: #2C2C2E;
-            --input-bg: #2C2C2E;
+            --input-bg: #1C1C1E;
             --btn-bg: #2C2C2E; 
             --btn-text: #A0A0A0;
-            --list-text: #C0C0C0;
+            --list-text: #E0E0E0;
             --danger-color: #FF453A;
             --success-color: #30D158;
             --separator: #38383A;
@@ -29,7 +29,6 @@
             color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
-            /* Weniger Padding oben, da Tabs weg sind */
             padding: 110px 15px 100px 15px; 
             min-height: 100vh;
             box-sizing: border-box;
@@ -40,12 +39,12 @@
             position: fixed; top: 0; left: 0; right: 0;
             background-color: rgba(0,0,0,0.95);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            z-index: 500; padding: 10px 15px 10px 15px; border-bottom: 1px solid #222;
+            z-index: 500; padding: 10px 15px 15px 15px; border-bottom: 1px solid #222;
         }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        h1 { font-weight: 700; font-size: 1.2rem; color: #fff; margin: 0; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        h1 { font-weight: 700; font-size: 1.3rem; color: #fff; margin: 0; }
         .settings-btn { background: none; border: none; cursor: pointer; padding: 5px; display: flex; align-items: center; }
-        .settings-btn svg { width: 22px; height: 22px; fill: #0A84FF; }
+        .settings-btn svg { width: 24px; height: 24px; fill: #0A84FF; }
 
         .search-container { position: relative; }
         .search-input { width: 100%; padding: 10px 12px 10px 32px; background-color: #1C1C1E; border: none; border-radius: 10px; color: #fff; font-size: 1rem; box-sizing: border-box; }
@@ -60,66 +59,118 @@
 
         .item-row {
             display: flex; background-color: var(--surface-color);
-            border-radius: 10px; overflow: hidden;
-            min-height: 54px; height: auto; align-items: stretch;
+            border-radius: 12px; overflow: hidden;
+            min-height: 55px; align-items: center;
+            padding-right: 15px; /* Platz für Pfeil */
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
+        .item-row:active { background-color: #333; }
 
-        .content-area {
-            flex-grow: 1; padding: 10px 15px; display: flex; align-items: center;
-            gap: 12px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+        .item-content {
+            flex-grow: 1; padding: 12px 15px;
+            display: flex; flex-direction: column; justify-content: center;
         }
-        .content-area:active { background-color: #2c2c2e; }
-
-        .type-icon { width: 18px; height: 18px; fill: #666; flex-shrink: 0; margin-top: 2px; }
         
-        .item-info { display: flex; flex-direction: column; overflow: hidden; justify-content: center; width: 100%; }
         .item-label {
-            font-size: 0.9rem; font-weight: 500; color: var(--list-text); line-height: 1.3;
-            white-space: normal; word-break: break-word;
+            font-size: 0.95rem; font-weight: 600; color: #fff;
+            margin-bottom: 3px;
         }
-        .item-count { font-size: 0.75rem; color: #555; margin-top: 2px; }
+        
+        .item-sub {
+            font-size: 0.75rem; color: #888; display: flex; gap: 8px; align-items: center;
+        }
 
-        .action-group { display: flex; border-left: 1px solid #2a2a2a; }
-        .icon-btn {
-            background: transparent; border: none; width: 44px; height: auto; min-height: 100%;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
-        }
-        .icon-btn svg { width: 18px; height: 18px; fill: #555; }
-        
-        .edit-btn:active { background-color: #333; }
-        .edit-btn svg { fill: #0A84FF; } /* Blau für Edit */
-        
-        .delete-btn:active { background-color: #333; }
-        .delete-btn svg { fill: #cf6679; } /* Rot für Delete */
+        .chevron { width: 8px; height: 14px; fill: #555; }
 
         /* --- BOTTOM BAR --- */
         .bottom-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
-            padding: 0 20px 25px 20px;
-            background: linear-gradient(to top, rgba(0,0,0,1) 30%, rgba(0,0,0,0));
+            padding: 0 20px 30px 20px;
+            background: linear-gradient(to top, rgba(0,0,0,1) 40%, rgba(0,0,0,0));
             pointer-events: none; display: flex; justify-content: center; z-index: 90;
         }
         .main-btn {
-            pointer-events: auto; padding: 12px 24px;
-            background-color: var(--btn-bg); color: var(--btn-text);
-            font-weight: 500; border: 1px solid #333; border-radius: 30px;
-            font-size: 0.95rem; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: transform 0.1s;
+            pointer-events: auto; padding: 14px 30px;
+            background-color: var(--btn-bg); color: #fff;
+            font-weight: 600; border: 1px solid #333; border-radius: 30px;
+            font-size: 1rem; cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6); transition: transform 0.1s;
         }
         .main-btn:active { transform: scale(0.95); background-color: #3a3a3c; }
 
-        /* --- MODALS --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.2s; }
+        /* --- COMMON MODAL STYLES --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.2s; }
         .modal-overlay.show { opacity: 1; visibility: visible; }
-        .modal-box { background-color: var(--modal-bg); padding: 25px; border-radius: 18px; width: 85%; max-width: 320px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border: 1px solid #333; max-height: 80vh; overflow-y: auto; }
-        .modal-title { font-size: 1rem; font-weight: 600; margin-bottom: 20px; text-align: center; color: #bbb; }
+        
+        .modal-box { 
+            background-color: var(--modal-bg); 
+            width: 90%; max-width: 380px; max-height: 85vh;
+            border-radius: 20px; border: 1px solid #333;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
+
+        .modal-header {
+            padding: 15px; border-bottom: 1px solid #333;
+            text-align: center; font-weight: 600; font-size: 1.1rem; color: #eee;
+            background-color: #252527;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .close-btn-x { background: none; border: none; color: #888; font-size: 1.5rem; line-height: 1; cursor: pointer; padding: 0 10px; }
+
+        .modal-body {
+            padding: 20px; overflow-y: auto; flex-grow: 1;
+        }
+
+        /* --- DETAIL VIEW STYLES --- */
+        .detail-text-box {
+            background-color: #1C1C1E; border-radius: 12px; padding: 15px;
+            margin-bottom: 20px; border: 1px solid #333;
+        }
+        .detail-text-content {
+            font-size: 0.95rem; line-height: 1.5; color: #ddd; white-space: pre-wrap; margin-bottom: 10px;
+        }
+        .copy-text-btn {
+            background-color: #333; color: var(--accent-blue); border: none;
+            padding: 8px 15px; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+            width: 100%; cursor: pointer;
+        }
+        .copy-text-btn:active { background-color: #444; }
+
+        .detail-images-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;
+        }
+        .detail-img {
+            width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid #444;
+        }
+
+        .detail-actions {
+            display: flex; gap: 10px; margin-top: 25px;
+        }
+        .detail-action-btn {
+            flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+        }
+        .btn-edit { background-color: #333; color: var(--accent-blue); }
+        .btn-delete { background-color: #333; color: var(--danger-color); }
+
+        /* --- EDIT FORM STYLES --- */
+        .modal-input { width: 100%; padding: 12px; background-color: #1C1C1E; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 1rem; box-sizing: border-box; margin-bottom: 15px; }
+        .modal-textarea { width: 100%; padding: 12px; background-color: #1C1C1E; border: 1px solid #333; border-radius: 10px; color: #ddd; font-size: 0.95rem; box-sizing: border-box; resize: none; min-height: 100px; margin-bottom: 15px; font-family: inherit; }
+        
+        .file-btn { display: block; width: 100%; padding: 12px; background-color: #333; color: #ccc; border-radius: 10px; text-align: center; margin-bottom: 15px; cursor: pointer; box-sizing: border-box; }
+        
+        .preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 20px; }
+        .preview-wrapper { position: relative; width: 100%; aspect-ratio: 1; }
+        .preview-thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid #444; }
+        .remove-img-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; width: 22px; height: 22px; border-radius: 50%; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        .save-btn-primary { width: 100%; padding: 14px; background-color: #333; color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; }
 
         /* --- SETTINGS --- */
         .settings-group { background-color: #222; border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
         .settings-row { padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; }
-        .settings-row:last-child { border-bottom: none; }
         .setting-label { font-size: 0.95rem; color: #ddd; }
-        .setting-sub { font-size: 0.75rem; color: #777; margin-top: 4px; max-width: 200px; }
         .switch { position: relative; display: inline-block; width: 50px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 34px; }
@@ -127,35 +178,14 @@
         input:checked + .slider { background-color: var(--success-color); }
         input:checked + .slider:before { transform: translateX(20px); }
         .manual-action-btn { width: 100%; padding: 15px; background: none; border: none; color: var(--accent-blue); font-size: 1rem; cursor: pointer; text-align: center; border-top: 1px solid #333; }
-        .manual-action-btn:active { background-color: #333; }
 
-        /* --- ADD/EDIT FORM --- */
-        .type-switch { display: flex; background-color: #3A3A3C; border-radius: 8px; padding: 4px; margin-bottom: 15px; }
-        .switch-opt { flex: 1; text-align: center; padding: 8px; font-size: 0.85rem; color: #888; border-radius: 6px; cursor: pointer; }
-        .switch-opt.active { background-color: #555; color: #fff; font-weight: 600; }
-        .modal-input, .modal-textarea { width: 100%; padding: 12px; background-color: #3A3A3C; border: 1px solid transparent; border-radius: 10px; color: #ddd; font-size: 0.95rem; box-sizing: border-box; font-family: inherit; resize: none; margin-bottom: 15px; }
-        .modal-input:focus, .modal-textarea:focus { outline: none; background-color: #444; }
-        .modal-textarea { min-height: 90px; }
-        .file-upload-wrapper { text-align: center; margin-bottom: 20px; }
-        .file-btn { display: inline-block; padding: 10px 20px; background-color: #444; color: #ccc; border-radius: 8px; font-size: 0.9rem; cursor: pointer; }
-        
-        #previewGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
-        .preview-wrapper { position: relative; width: 100%; aspect-ratio: 1; }
-        .preview-thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid #444; opacity: 0.8; }
-        .remove-img-btn { position: absolute; top: -5px; right: -5px; background: rgba(255, 69, 58, 0.9); color: white; width: 20px; height: 20px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-
-        .modal-actions { display: flex; gap: 10px; }
-        .modal-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 0.9rem; font-weight: 500; cursor: pointer; }
-        .btn-cancel { background-color: transparent; color: var(--danger-color); }
-        .btn-save { background-color: #444; color: #fff; }
-
-        /* --- VIEWER --- */
+        /* --- FULLSCREEN VIEWER --- */
         #imgViewerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: opacity 0.3s; }
         #imgViewerOverlay.show { opacity: 1; visibility: visible; }
         #viewerScrollContainer { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 10px 100px 10px; }
-        .viewer-img { max-width: 100%; border-radius: 4px; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .viewer-img { max-width: 100%; border-radius: 4px; }
         .viewer-actions { position: absolute; bottom: 30px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; background: linear-gradient(to top, rgba(0,0,0,1), transparent); padding-top: 20px; }
-        .viewer-btn { background-color: rgba(50,50,50,0.8); color: white; border: 1px solid #555; padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; backdrop-filter: blur(10px); }
+        .viewer-btn { background-color: rgba(50,50,50,0.8); color: white; border: 1px solid #555; padding: 10px 20px; border-radius: 20px; backdrop-filter: blur(10px); }
 
         #toast { visibility: hidden; min-width: 100px; background-color: #222; color: #ccc; text-align: center; border-radius: 50px; padding: 8px 16px; position: fixed; z-index: 3000; top: 15px; left: 50%; transform: translateX(-50%); font-size: 12px; opacity: 0; transition: opacity 0.3s, top 0.3s; border: 1px solid #333; }
         #toast.show { visibility: visible; opacity: 1; top: 35px; }
@@ -177,61 +207,85 @@
             <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             <input type="text" id="searchInput" class="search-input" placeholder="Suchen..." oninput="handleSearch()">
         </div>
-        </div>
+    </div>
     
     <div id="list-container"></div>
+    
     <div class="bottom-bar">
-        <button class="main-btn" onclick="openAddModal()">Neues Element</button>
+        <button class="main-btn" onclick="openAddModal()">+ Neues Element</button>
     </div>
 
-    <div id="modalOverlay" class="modal-overlay">
+    <div id="addEditModal" class="modal-overlay">
         <div class="modal-box">
-            <div id="modalTitle" class="modal-title">Neu</div>
+            <div class="modal-header">
+                <span id="modalTitle">Neu</span>
+                <button class="close-btn-x" onclick="closeAddEditModal()">&times;</button>
+            </div>
             
-            <div class="type-switch" id="typeSwitchContainer">
-                <div id="tabText" class="switch-opt active" onclick="switchTab('text')">Text</div>
-                <div id="tabImage" class="switch-opt" onclick="switchTab('image')">Bilder</div>
-            </div>
-
-            <input type="text" id="modalLabel" class="modal-input" placeholder="Titel" autocomplete="off">
-            <div id="textSection"><textarea id="modalText" class="modal-textarea" placeholder="Inhalt"></textarea></div>
-            <div id="imageSection" style="display: none;">
+            <div class="modal-body">
+                <input type="text" id="modalLabel" class="modal-input" placeholder="Titel (z.B. Mietvertrag)" autocomplete="off">
+                <textarea id="modalText" class="modal-textarea" placeholder="Text hier eingeben..."></textarea>
+                
                 <div class="file-upload-wrapper">
-                    <label for="fileInput" class="file-btn">Bilder hinzufügen</label>
+                    <label for="fileInput" class="file-btn">📷 Bilder hinzufügen</label>
                     <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleFileSelect(this)">
-                    <div style="font-size: 0.75rem; color:#666; margin-top:8px;">Auto-Komprimierung aktiv.</div>
-                    <div id="previewGrid"></div>
+                    <div id="previewGrid" class="preview-grid"></div>
                 </div>
+
+                <button id="modalSaveBtn" class="save-btn-primary" onclick="handleSave()">Speichern <div id="loader"></div></button>
             </div>
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
-                <button id="modalSaveBtn" class="btn-save" onclick="handleSave()">Speichern <div id="loader"></div></button>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span id="detailTitle">Details</span>
+                <button class="close-btn-x" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="detailTextBox" class="detail-text-box" style="display:none;">
+                    <div id="detailTextContent" class="detail-text-content"></div>
+                    <button class="copy-text-btn" onclick="copyDetailText()">Text kopieren</button>
+                </div>
+
+                <div id="detailImagesBox" style="display:none;">
+                    <div style="color:#888; font-size:0.8rem; margin-bottom:5px;">Bilder (Antippen zum Vergrößern):</div>
+                    <div id="detailImagesGrid" class="detail-images-grid"></div>
+                </div>
+
+                <div class="detail-actions">
+                    <button class="detail-action-btn btn-edit" onclick="editFromDetail()">Bearbeiten</button>
+                    <button class="detail-action-btn btn-delete" onclick="deleteFromDetail()">Löschen</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="settingsOverlay" class="modal-overlay">
-        <div class="modal-box" style="padding: 0; overflow: hidden;">
-            <div style="padding: 20px; text-align: center; font-weight: 600; color: #ddd; background-color: #2c2c2e;">Einstellungen</div>
-            <div class="settings-group">
-                <div class="settings-row">
-                    <div>
-                        <div class="setting-label">Auto-Backup</div>
-                        <div class="setting-sub">Backup-Dialog nach Änderung.</div>
+        <div class="modal-box" style="height: auto; max-height: none;">
+            <div class="modal-header">
+                <span>Einstellungen</span>
+                <button class="close-btn-x" onclick="closeSettings()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <div class="settings-row">
+                        <div>
+                            <div style="color:#ddd; font-weight:500;">Auto-Backup</div>
+                            <div style="font-size:0.75rem; color:#777; margin-top:2px;">Fragt nach Speichern/Löschen</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="autoBackupToggle" onchange="toggleAutoBackup()">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
-                    <label class="switch">
-                        <input type="checkbox" id="autoBackupToggle" onchange="toggleAutoBackup()">
-                        <span class="slider round"></span>
-                    </label>
                 </div>
-            </div>
-            <div class="settings-group">
-                <button class="manual-action-btn" onclick="exportBackup()">Backup jetzt erstellen</button>
-                <button class="manual-action-btn" onclick="document.getElementById('importFile').click()">Backup wiederherstellen</button>
-                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(this)">
-            </div>
-            <div style="padding: 10px;">
-                <button class="btn-save" style="width: 100%; padding: 12px; border-radius: 10px;" onclick="closeSettings()">Fertig</button>
+                <div class="settings-group">
+                    <button class="manual-action-btn" onclick="exportBackup()">Backup jetzt erstellen</button>
+                    <button class="manual-action-btn" onclick="document.getElementById('importFile').click()">Backup wiederherstellen</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(this)">
+                </div>
             </div>
         </div>
     </div>
@@ -247,17 +301,19 @@
     <div id="toast">Info</div>
 
     <script>
-        const DB_NAME = 'SafeSpaceDB'; const STORE_NAME = 'items';
+        // --- CONFIG ---
+        const DB_NAME = 'SafeSpaceDB';
+        const STORE_NAME = 'items';
         let autoBackupEnabled = JSON.parse(localStorage.getItem('autoBackupEnabled')) || false;
         document.getElementById('autoBackupToggle').checked = autoBackupEnabled;
 
-        const ICON_TEXT = `<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
-        const ICON_IMAGE = `<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
-        const ICON_EDIT = `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
-        const ICON_DELETE = `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
+        // --- ICONS ---
+        // Simple Chevron for list items
+        const ICON_CHEVRON = `<svg class="chevron" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>`;
 
+        // --- DB OPS ---
         const dbPromise = new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, 2);
+            const request = indexedDB.open(DB_NAME, 3); // Bump version to ensure cleanliness
             request.onupgradeneeded = (e) => {
                 const db = e.target.result;
                 if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
@@ -302,17 +358,29 @@
             });
         }
 
-        let currentMode = 'text'; 
-        let currentImages = []; 
-        let allItems = []; 
-        let viewingItemImages = [];
+        // --- STATE ---
+        let allItems = [];
         let currentSearchQuery = '';
+        
+        // Edit/Detail State
+        let currentImages = []; // Bilder im Add/Edit Modal
         let editingItemId = null;
+        let activeDetailItem = null; // Item currently viewing in Detail
+        let viewingItemImages = []; // For Fullscreen
 
         loadList();
 
         async function loadList() {
             allItems = await getAllItems();
+            // Data Migration for old versions (normalize structure)
+            allItems = allItems.map(item => {
+                // Ensure everything has text and images array
+                if (!item.images) item.images = [];
+                if (!item.text && item.content && item.type === 'text') item.text = item.content;
+                if (item.content && item.type === 'image' && Array.isArray(item.content)) item.images = item.content;
+                // Cleanup old fields if wanted, but okay to leave
+                return item;
+            });
             renderList();
         }
 
@@ -325,133 +393,147 @@
             const container = document.getElementById('list-container');
             container.innerHTML = '';
             
-            // KEIN Filter mehr nach Typ, wir zeigen alles
             let filtered = allItems;
-            
             if(currentSearchQuery) {
                 filtered = filtered.filter(item => item.label.toLowerCase().includes(currentSearchQuery));
             }
 
             if(filtered.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:#555; font-size: 0.8rem; margin-top:40px;">Keine Einträge.</div>';
+                container.innerHTML = '<div style="text-align:center; color:#555; font-size: 0.8rem; margin-top:40px;">Keine Einträge gefunden.</div>';
                 return;
             }
+
+            // Sortierung: Neueste zuerst (optional)
+            filtered.sort((a,b) => b.id - a.id);
 
             filtered.forEach((item) => {
                 const row = document.createElement('div');
                 row.className = 'item-row';
                 
-                const content = document.createElement('div');
-                content.className = 'content-area';
-                const icon = document.createElement('div');
-                icon.className = 'type-icon';
-                icon.innerHTML = item.type === 'image' ? ICON_IMAGE : ICON_TEXT;
-
-                const infoDiv = document.createElement('div');
-                infoDiv.className = 'item-info';
-                const label = document.createElement('span');
-                label.className = 'item-label';
-                label.innerText = item.label;
-                infoDiv.appendChild(label);
-
-                if(item.type === 'image' && Array.isArray(item.content)) {
-                    const count = document.createElement('span');
-                    count.className = 'item-count';
-                    count.innerText = item.content.length + (item.content.length === 1 ? ' Bild' : ' Bilder');
-                    infoDiv.appendChild(count);
-                }
-                content.appendChild(icon);
-                content.appendChild(infoDiv);
-
-                content.onclick = () => {
-                    if (item.type === 'text') copyToClipboard(item.content);
-                    else {
-                        const imgs = Array.isArray(item.content) ? item.content : [item.content];
-                        openImageViewer(imgs);
-                    }
-                };
-
-                const actionGroup = document.createElement('div');
-                actionGroup.className = 'action-group';
+                // Content Logic
+                const hasText = item.text && item.text.trim().length > 0;
+                const imgCount = item.images ? item.images.length : 0;
                 
-                const editBtn = document.createElement('button');
-                editBtn.className = 'icon-btn edit-btn';
-                editBtn.innerHTML = ICON_EDIT;
-                editBtn.onclick = () => openEditModal(item);
+                let subText = "";
+                if(hasText && imgCount > 0) subText = `Text + ${imgCount} Bild(er)`;
+                else if(hasText) subText = "Nur Text";
+                else if(imgCount > 0) subText = `${imgCount} Bild(er)`;
+                else subText = "Leer";
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'icon-btn delete-btn';
-                deleteBtn.innerHTML = ICON_DELETE;
-                deleteBtn.onclick = () => handleDelete(item.id);
+                row.innerHTML = `
+                    <div class="item-content">
+                        <div class="item-label">${item.label}</div>
+                        <div class="item-sub">${subText}</div>
+                    </div>
+                    ${ICON_CHEVRON}
+                `;
                 
-                actionGroup.appendChild(editBtn);
-                actionGroup.appendChild(deleteBtn);
-
-                row.appendChild(content);
-                row.appendChild(actionGroup);
+                row.onclick = () => openDetailModal(item);
                 container.appendChild(row);
             });
         }
 
-        // --- MODAL LOGIC (ADD & EDIT) ---
-        const modalOverlay = document.getElementById('modalOverlay');
-        const settingsOverlay = document.getElementById('settingsOverlay');
+        // --- DETAIL MODAL LOGIC ---
+        const detailModal = document.getElementById('detailModal');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailTextBox = document.getElementById('detailTextBox');
+        const detailTextContent = document.getElementById('detailTextContent');
+        const detailImagesBox = document.getElementById('detailImagesBox');
+        const detailImagesGrid = document.getElementById('detailImagesGrid');
+
+        function openDetailModal(item) {
+            activeDetailItem = item;
+            detailTitle.innerText = item.label;
+            
+            // Text Handling
+            if(item.text && item.text.trim()) {
+                detailTextBox.style.display = 'block';
+                detailTextContent.innerText = item.text;
+            } else {
+                detailTextBox.style.display = 'none';
+            }
+
+            // Image Handling
+            if(item.images && item.images.length > 0) {
+                detailImagesBox.style.display = 'block';
+                detailImagesGrid.innerHTML = '';
+                item.images.forEach(imgSrc => {
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.className = 'detail-img';
+                    img.onclick = () => openImageViewer(item.images);
+                    detailImagesGrid.appendChild(img);
+                });
+            } else {
+                detailImagesBox.style.display = 'none';
+            }
+
+            detailModal.classList.add('show');
+        }
+
+        function closeDetailModal() {
+            detailModal.classList.remove('show');
+            activeDetailItem = null;
+        }
+
+        async function copyDetailText() {
+            if(activeDetailItem && activeDetailItem.text) {
+                await copyToClipboard(activeDetailItem.text);
+            }
+        }
+
+        function editFromDetail() {
+            if(!activeDetailItem) return;
+            const itemToEdit = activeDetailItem;
+            closeDetailModal();
+            // Short delay for smooth transition
+            setTimeout(() => openAddEditModal(itemToEdit), 200);
+        }
+
+        async function deleteFromDetail() {
+            if(!activeDetailItem) return;
+            if(confirm('Diesen Eintrag wirklich löschen?')) {
+                await deleteItem(activeDetailItem.id);
+                closeDetailModal();
+                loadList();
+                if(autoBackupEnabled) setTimeout(() => exportBackup(), 500);
+            }
+        }
+
+        // --- ADD / EDIT MODAL LOGIC ---
+        const addEditModal = document.getElementById('addEditModal');
+        const modalTitleInput = document.getElementById('modalTitle'); // Header span
         const modalLabel = document.getElementById('modalLabel');
         const modalText = document.getElementById('modalText');
         const previewGrid = document.getElementById('previewGrid');
         const fileInput = document.getElementById('fileInput');
         const modalSaveBtn = document.getElementById('modalSaveBtn');
         const loader = document.getElementById('loader');
-        const modalTitle = document.getElementById('modalTitle');
-        const typeSwitchContainer = document.getElementById('typeSwitchContainer');
 
         function openAddModal() {
-            editingItemId = null;
-            modalTitle.innerText = "Neu";
-            typeSwitchContainer.style.display = 'flex';
-            modalLabel.value = ''; modalText.value = ''; fileInput.value = '';
-            previewGrid.innerHTML = ''; currentImages = [];
-            modalSaveBtn.disabled = false; loader.style.display = 'none';
-            switchTab('text'); 
-            modalOverlay.classList.add('show');
-            setTimeout(() => modalLabel.focus(), 50);
+            openAddEditModal(null);
         }
 
-        function openEditModal(item) {
-            editingItemId = item.id;
-            modalTitle.innerText = "Bearbeiten";
-            typeSwitchContainer.style.display = 'none';
+        function openAddEditModal(item) {
+            editingItemId = item ? item.id : null;
+            modalTitleInput.innerText = item ? "Bearbeiten" : "Neu";
             
-            currentMode = item.type;
-            switchTab(item.type);
+            // Reset Values
+            modalLabel.value = item ? item.label : '';
+            modalText.value = item ? (item.text || '') : '';
+            fileInput.value = '';
             
-            modalLabel.value = item.label;
-            
-            if (item.type === 'text') {
-                modalText.value = item.content;
-            } else {
-                currentImages = Array.isArray(item.content) ? [...item.content] : [item.content];
-                renderModalImages();
-            }
+            // Images
+            currentImages = item && item.images ? [...item.images] : [];
+            renderPreviewGrid();
 
             modalSaveBtn.disabled = false; loader.style.display = 'none';
-            modalOverlay.classList.add('show');
+            addEditModal.classList.add('show');
+            if(!item) setTimeout(() => modalLabel.focus(), 50);
         }
 
-        function closeModal() { modalOverlay.classList.remove('show'); }
-        function openSettings() { settingsOverlay.classList.add('show'); }
-        function closeSettings() { settingsOverlay.classList.remove('show'); }
-        function toggleAutoBackup() {
-            autoBackupEnabled = document.getElementById('autoBackupToggle').checked;
-            localStorage.setItem('autoBackupEnabled', JSON.stringify(autoBackupEnabled));
-        }
-
-        function switchTab(mode) {
-            currentMode = mode;
-            document.getElementById('tabText').className = `switch-opt ${mode === 'text' ? 'active' : ''}`;
-            document.getElementById('tabImage').className = `switch-opt ${mode === 'image' ? 'active' : ''}`;
-            document.getElementById('textSection').style.display = mode === 'text' ? 'block' : 'none';
-            document.getElementById('imageSection').style.display = mode === 'image' ? 'block' : 'none';
+        function closeAddEditModal() {
+            addEditModal.classList.remove('show');
         }
 
         async function handleFileSelect(input) {
@@ -462,25 +544,29 @@
                     const compressed = await compressImage(file);
                     currentImages.push(compressed);
                 }
-                renderModalImages();
+                renderPreviewGrid();
                 modalSaveBtn.disabled = false; loader.style.display = 'none';
             }
+            // Reset Input to allow selecting same file again
+            input.value = ''; 
         }
-        
-        function renderModalImages() {
+
+        function renderPreviewGrid() {
             previewGrid.innerHTML = '';
             currentImages.forEach((imgSrc, index) => {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'preview-wrapper';
                 const img = document.createElement('img');
                 img.src = imgSrc; img.className = 'preview-thumb';
+                
                 const delBtn = document.createElement('button');
                 delBtn.className = 'remove-img-btn';
                 delBtn.innerHTML = '&times;';
                 delBtn.onclick = () => {
                     currentImages.splice(index, 1);
-                    renderModalImages();
+                    renderPreviewGrid();
                 };
+                
                 wrapper.appendChild(img);
                 wrapper.appendChild(delBtn);
                 previewGrid.appendChild(wrapper);
@@ -507,35 +593,35 @@
 
         async function handleSave() {
             const label = modalLabel.value.trim();
-            if (!label) return;
+            if (!label) { alert("Bitte einen Titel eingeben."); return; }
             
-            let newItem = { label: label, type: currentMode };
+            const textContent = modalText.value.trim();
             
-            if (currentMode === 'text') {
-                const text = modalText.value.trim(); if (!text) return; 
-                newItem.content = text;
-            } else {
-                if (currentImages.length === 0) { alert("Kein Bild."); return; } 
-                newItem.content = currentImages;
-            }
+            const newItem = {
+                label: label,
+                text: textContent,
+                images: currentImages
+            };
 
             if (editingItemId !== null) {
                 newItem.id = editingItemId;
                 await updateItem(newItem);
             } else {
-                await addItem(newItem); 
+                await addItem(newItem);
             }
 
             await loadList(); 
-            closeModal();
+            closeAddEditModal();
             if(autoBackupEnabled) setTimeout(() => { exportBackup(); }, 500);
         }
 
-        async function handleDelete(id) {
-            if(confirm('Löschen?')) { 
-                await deleteItem(id); await loadList(); 
-                if(autoBackupEnabled) setTimeout(() => { exportBackup(); }, 500);
-            }
+        // --- SETTINGS / BACKUP ---
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        function openSettings() { settingsOverlay.classList.add('show'); }
+        function closeSettings() { settingsOverlay.classList.remove('show'); }
+        function toggleAutoBackup() {
+            autoBackupEnabled = document.getElementById('autoBackupToggle').checked;
+            localStorage.setItem('autoBackupEnabled', JSON.stringify(autoBackupEnabled));
         }
 
         async function exportBackup() {
@@ -544,7 +630,7 @@
             const dataStr = JSON.stringify(allData);
             const blob = new Blob([dataStr], {type: "application/json"});
             const file = new File([blob], "SafeSpace_Backup.json", {type: "application/json"});
-            if (navigator.share) { try { await navigator.share({ files: [file] }); showToast("Wähle Speicherort"); } catch(e) {} }
+            if (navigator.share) { try { await navigator.share({ files: [file] }); } catch(e) {} }
             else { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = "SafeSpace_Backup.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
         }
         async function importBackup(input) {
@@ -555,13 +641,19 @@
             reader.onload = async function(e) {
                 try {
                     const items = JSON.parse(e.target.result); if(!Array.isArray(items)) throw new Error();
-                    await clearAllItems(); for(let item of items) { delete item.id; await addItem(item); }
+                    await clearAllItems(); 
+                    for(let item of items) { 
+                        // Clean ID to auto-increment
+                        delete item.id; 
+                        await addItem(item); 
+                    }
                     loadList(); showToast("Wiederhergestellt!"); closeSettings();
                 } catch (err) { alert("Fehler beim Laden."); }
             };
             reader.readAsText(file);
         }
 
+        // --- VIEWER ---
         const imgViewer = document.getElementById('imgViewerOverlay');
         const viewerContainer = document.getElementById('viewerScrollContainer');
         function openImageViewer(imagesArray) {
@@ -570,7 +662,6 @@
             imgViewer.classList.add('show');
         }
         function closeImageViewer() { imgViewer.classList.remove('show'); }
-        async function copyToClipboard(text) { try { await navigator.clipboard.writeText(text); showToast("Kopiert!"); } catch (err) { showToast("Fehler"); } }
         async function shareImages() {
             if (!viewingItemImages || viewingItemImages.length === 0) return;
             const filesArray = [];
@@ -580,6 +671,9 @@
             }
             if (navigator.share) { try { await navigator.share({ files: filesArray }); } catch (err) {} } else { alert("Nicht unterstützt"); }
         }
+
+        // --- UTILS ---
+        async function copyToClipboard(text) { try { await navigator.clipboard.writeText(text); showToast("Kopiert!"); } catch (err) { showToast("Fehler"); } }
         function showToast(msg) {
             const toast = document.getElementById("toast"); toast.innerText = msg; toast.className = "show";
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 1500);
