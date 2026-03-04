@@ -352,28 +352,59 @@
     <div id="toast">Info</div>
 
     <script>
-        // --- SPINTAX DICTIONARY ---
+        // --- VOLLAUTOMATISCHES WÖRTERBUCH ---
+        // Die App sucht sich diese Begriffe selbst aus deinem normalen Text und tauscht sie aus.
         const spintaxDict = [
-            { match: /\bsehr gut\b/gi, replacements: ["sehr gut", "top Zustand", "einwandfrei", "super Zustand", "klasse", "ohne Mängel"] },
-            { match: /\bneu\b/gi, replacements: ["neu", "ungetragen", "neuwertig", "absolut neu", "wie neu"] },
+            { match: /\bsehr gut\b/gi, replacements: ["sehr gut", "top Zustand", "einwandfrei", "super Zustand", "klasse Zustand", "ohne Mängel"] },
+            { match: /\bneu\b/gi, replacements: ["neu", "ungetragen", "nagelneu", "brandneu", "komplett neu", "ungewaschen und neu"] },
             { match: /\bverkaufe\b/gi, replacements: ["Verkaufe", "Biete", "Biete hier", "Hier gibt es", "Vergebe"] },
-            { match: /\bschön\b/gi, replacements: ["schön", "toll", "wunderschön", "klasse", "richtig schön"] },
+            { match: /\bschön\b/gi, replacements: ["schön", "toll", "wunderschön", "klasse", "richtig schön", "sehr hübsch"] },
             { match: /\bperfekt\b/gi, replacements: ["perfekt", "ideal", "super passend", "optimal"] },
             { match: /\bschnell\b/gi, replacements: ["schnell", "zügig", "flott", "sofort"] },
             { match: /\bkeine mängel\b/gi, replacements: ["keine Mängel", "ohne Fehler", "makellos", "keine Löcher oder Flecken"] },
-            { match: /\bgroßartig\b/gi, replacements: ["großartig", "fantastisch", "wunderbar", "super"] }
+            { match: /\bgern getragen\b/gi, replacements: ["gern getragen", "oft getragen", "Lieblingsteil"] },
+            { match: /\btierfreier nichtraucherhaushalt\b/gi, replacements: ["tierfreier Nichtraucherhaushalt", "Nichtraucherhaushalt ohne Tiere", "aus tierfreiem Nichtraucherhaushalt"] }
         ];
 
         function applySpintax(text) {
             if(!text) return "";
             let result = text;
+            
+            // 1. Manuelle Spintax-Klammern auswerten (falls du sie doch mal nutzen willst, ansonsten wird das ignoriert)
+            const spintaxRegex = /\{([^{}]+)\}/g;
+            let match;
+            while ((match = spintaxRegex.exec(result)) !== null) {
+                const options = match[1].split('|');
+                const choice = options[Math.floor(Math.random() * options.length)];
+                result = result.replace(match[0], choice);
+                spintaxRegex.lastIndex = 0;
+            }
+
+            // 2. Automatisches Wörterbuch anwenden (ersetzt Wörter vollautomatisch)
             spintaxDict.forEach(rule => {
                 result = result.replace(rule.match, () => {
                     const arr = rule.replacements;
                     return arr[Math.floor(Math.random() * arr.length)];
                 });
             });
-            return result;
+
+            // 3. DER VINTED-KILLER-TRICK: UNSICHTBARE LEERZEICHEN (Hash-Busting für Text)
+            // Die App baut vollautomatisch unsichtbare Zeichen ein. 
+            // Du liest ganz normal, aber Vinted sieht jedes Mal einen anderen, einzigartigen Code.
+            let hashedText = "";
+            for(let i=0; i<result.length; i++) {
+                hashedText += result[i];
+                // Bei jedem Leerzeichen gibt es eine 50% Chance, ein unsichtbares Zeichen anzuhängen
+                if (result[i] === ' ' && Math.random() > 0.5) {
+                    hashedText += '\u200B'; // Dies ist das unsichtbare Zeichen
+                }
+            }
+            
+            // Fügt am Ende des Textes noch zufällig unsichtbare Zeichen hinzu
+            const randomEndPadding = '\u200B'.repeat(Math.floor(Math.random() * 5));
+            hashedText += randomEndPadding;
+
+            return hashedText;
         }
 
         // --- CONFIG ---
@@ -564,7 +595,6 @@
             activeDetailItem = item;
             detailTitle.innerText = "Details";
             
-            // Random Price Generation
             const newPrice = generatePrice(item.minPrice, item.maxPrice);
             if(newPrice) {
                 detailPriceBox.style.display = 'block';
@@ -573,7 +603,6 @@
                 detailPriceBox.style.display = 'none';
             }
 
-            // Spintax Text Generation
             if((item.text && item.text.trim()) || (item.label && item.label.trim())) {
                 detailTextBox.style.display = 'block';
                 currentSpunTitle = applySpintax(item.label);
@@ -585,7 +614,6 @@
                 detailTextBox.style.display = 'none';
             }
 
-            // Images
             if(item.images && item.images.length > 0) {
                 detailImagesBox.style.display = 'block';
                 detailImagesGrid.innerHTML = '';
@@ -795,14 +823,12 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
                     
-                    // Hash Busting: Verändere unsichtbar 1 Pixel
                     const x = Math.floor(Math.random() * img.width);
                     const y = Math.floor(Math.random() * img.height);
                     const imgData = ctx.getImageData(x, y, 1, 1);
                     imgData.data[0] = (imgData.data[0] + 1) % 256; 
                     ctx.putImageData(imgData, x, y);
                     
-                    // Hash Busting: Minimale Variation der Qualität
                     const randomQuality = 0.90 + (Math.random() * 0.08); 
                     canvas.toBlob(blob => resolve(blob), 'image/jpeg', randomQuality);
                 };
