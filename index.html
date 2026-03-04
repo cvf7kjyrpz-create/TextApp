@@ -352,7 +352,7 @@
     <div id="toast">Info</div>
 
     <script>
-        // --- 1. TITEL-SHUFFLER (NEU: Ändert Reihenfolge im Titel) ---
+        // --- 1. TITEL-SHUFFLER ---
         const titleModifiers = [
             { match: /\b(neu|ungetragen|nagelneu|brandneu|komplett neu)\b/gi, synonyms: ["Neu", "Ungetragen", "Nagelneu", "Brandneu"] },
             { match: /\b(schön|toll|wunderschön|klasse)\b/gi, synonyms: ["Schön", "Tolles Teil", "Wunderschön", "Sehr schön"] },
@@ -364,21 +364,17 @@
             let coreTitle = title;
             let foundSynonyms = [];
 
-            // Extrahiert gefundene Wörter und sucht Synonyme
             titleModifiers.forEach(mod => {
                 if (mod.match.test(coreTitle)) {
                     foundSynonyms.push(mod.synonyms[Math.floor(Math.random() * mod.synonyms.length)]);
-                    // Entfernt das gefundene Wort aus dem Kern-Titel
                     coreTitle = coreTitle.replace(mod.match, '').trim();
                 }
             });
 
-            // Säubert übrig gebliebene Leerzeichen oder Satzzeichen
             coreTitle = coreTitle.replace(/\s+/g, ' ').trim();
             coreTitle = coreTitle.replace(/^[^a-zA-Z0-9ÄÖÜäöüß]+|[^a-zA-Z0-9ÄÖÜäöüß]+$/g, '').trim();
 
             if (foundSynonyms.length === 0 || coreTitle === "") {
-                // Wenn keine Modifikatoren gefunden wurden, bleibt der Titel wie er ist (nur Standard-Worttausch)
                 let basicTitle = title;
                 titleModifiers.forEach(mod => {
                     basicTitle = basicTitle.replace(mod.match, () => mod.synonyms[Math.floor(Math.random() * mod.synonyms.length)]);
@@ -386,7 +382,6 @@
                 return basicTitle;
             }
 
-            // Kombiniert den sauberen Kern-Titel mit den Synonymen in völlig neuen Reihenfolgen
             const modifierStr = foundSynonyms.join(" & ");
             const templates = [
                 `${modifierStr}: ${coreTitle}`,
@@ -399,7 +394,7 @@
         }
 
 
-        // --- 2. TEXT-WÖRTERBUCH (Für die Beschreibung) ---
+        // --- 2. TEXT-WÖRTERBUCH & SHUFFLER (Für die Beschreibung) ---
         const spintaxDict = [
             { match: /\bsehr gut\b/gi, replacements: ["sehr gut", "top Zustand", "einwandfrei", "super Zustand", "klasse Zustand", "ohne Mängel"] },
             { match: /\bneu\b/gi, replacements: ["neu", "ungetragen", "nagelneu", "brandneu", "komplett neu", "ungewaschen und neu"] },
@@ -426,7 +421,32 @@
                 spintaxRegex.lastIndex = 0;
             }
 
-            // 2. Automatisches Wörterbuch anwenden
+            // 2. NEU: ZEILEN- UND SATZ-MISCHER (Nur für den Beschreibungstext)
+            if (addInvisibleChars) {
+                // Den Text anhand von Zeilenumbrüchen auftrennen
+                let lines = result.split('\n').filter(line => line.trim() !== '');
+                
+                // Alle Zeilen/Absätze komplett mischen
+                for (let i = lines.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [lines[i], lines[j]] = [lines[j], lines[i]];
+                }
+                
+                // Falls Sätze innerhalb einer Zeile durch Punkt getrennt sind, auch diese mischen
+                result = lines.map(line => {
+                    if (line.includes('. ')) {
+                        let sentences = line.split('. ').filter(s => s.trim() !== '');
+                        for (let i = sentences.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [sentences[i], sentences[j]] = [sentences[j], sentences[i]];
+                        }
+                        return sentences.map(s => s.trim() + (s.endsWith('.') || s.endsWith('!') || s.endsWith('?') || s.endsWith(':') ? '' : '.')).join(' ');
+                    }
+                    return line;
+                }).join('\n\n'); // Mit einem sauberen doppelten Zeilenumbruch wieder zusammensetzen
+            }
+
+            // 3. Automatisches Wörterbuch anwenden
             spintaxDict.forEach(rule => {
                 result = result.replace(rule.match, () => {
                     const arr = rule.replacements;
@@ -434,7 +454,7 @@
                 });
             });
 
-            // 3. Unsichtbare Leerzeichen für die Textbeschreibung
+            // 4. Unsichtbare Leerzeichen (NUR für den Beschreibungstext)
             if (addInvisibleChars) {
                 let hashedText = "";
                 for(let i=0; i<result.length; i++) {
@@ -650,11 +670,11 @@
             if((item.text && item.text.trim()) || (item.label && item.label.trim())) {
                 detailTextBox.style.display = 'block';
                 
-                // Titel mit dem neuen Shuffler generieren (Keine unsichtbaren Zeichen)
+                // Titel generieren (ohne unsichtbare Zeichen)
                 currentSpunTitle = applyTitleSpintax(item.label);
                 detailTitleContent.innerText = currentSpunTitle;
                 
-                // Text MIT unsichtbaren Zeichen generieren (true)
+                // Text generieren (inkl. Zeilen mischen und unsichtbaren Zeichen = true)
                 currentSpunDesc = applySpintax(item.text, true);
                 detailTextContent.innerText = currentSpunDesc;
             } else {
