@@ -353,7 +353,6 @@
 
     <script>
         // --- VOLLAUTOMATISCHES WÖRTERBUCH ---
-        // Die App sucht sich diese Begriffe selbst aus deinem normalen Text und tauscht sie aus.
         const spintaxDict = [
             { match: /\bsehr gut\b/gi, replacements: ["sehr gut", "top Zustand", "einwandfrei", "super Zustand", "klasse Zustand", "ohne Mängel"] },
             { match: /\bneu\b/gi, replacements: ["neu", "ungetragen", "nagelneu", "brandneu", "komplett neu", "ungewaschen und neu"] },
@@ -366,11 +365,12 @@
             { match: /\btierfreier nichtraucherhaushalt\b/gi, replacements: ["tierfreier Nichtraucherhaushalt", "Nichtraucherhaushalt ohne Tiere", "aus tierfreiem Nichtraucherhaushalt"] }
         ];
 
-        function applySpintax(text) {
+        // Funktion erhält jetzt eine zweite Variable (addInvisibleChars), um zu steuern, wo getrickst wird
+        function applySpintax(text, addInvisibleChars = false) {
             if(!text) return "";
             let result = text;
             
-            // 1. Manuelle Spintax-Klammern auswerten (falls du sie doch mal nutzen willst, ansonsten wird das ignoriert)
+            // 1. Manuelle Spintax-Klammern auswerten
             const spintaxRegex = /\{([^{}]+)\}/g;
             let match;
             while ((match = spintaxRegex.exec(result)) !== null) {
@@ -380,7 +380,7 @@
                 spintaxRegex.lastIndex = 0;
             }
 
-            // 2. Automatisches Wörterbuch anwenden (ersetzt Wörter vollautomatisch)
+            // 2. Automatisches Wörterbuch anwenden
             spintaxDict.forEach(rule => {
                 result = result.replace(rule.match, () => {
                     const arr = rule.replacements;
@@ -388,23 +388,21 @@
                 });
             });
 
-            // 3. DER VINTED-KILLER-TRICK: UNSICHTBARE LEERZEICHEN (Hash-Busting für Text)
-            // Die App baut vollautomatisch unsichtbare Zeichen ein. 
-            // Du liest ganz normal, aber Vinted sieht jedes Mal einen anderen, einzigartigen Code.
-            let hashedText = "";
-            for(let i=0; i<result.length; i++) {
-                hashedText += result[i];
-                // Bei jedem Leerzeichen gibt es eine 50% Chance, ein unsichtbares Zeichen anzuhängen
-                if (result[i] === ' ' && Math.random() > 0.5) {
-                    hashedText += '\u200B'; // Dies ist das unsichtbare Zeichen
+            // 3. Unsichtbare Leerzeichen (NUR wenn erlaubt)
+            if (addInvisibleChars) {
+                let hashedText = "";
+                for(let i=0; i<result.length; i++) {
+                    hashedText += result[i];
+                    if (result[i] === ' ' && Math.random() > 0.5) {
+                        hashedText += '\u200B';
+                    }
                 }
+                const randomEndPadding = '\u200B'.repeat(Math.floor(Math.random() * 5));
+                hashedText += randomEndPadding;
+                return hashedText;
             }
-            
-            // Fügt am Ende des Textes noch zufällig unsichtbare Zeichen hinzu
-            const randomEndPadding = '\u200B'.repeat(Math.floor(Math.random() * 5));
-            hashedText += randomEndPadding;
 
-            return hashedText;
+            return result;
         }
 
         // --- CONFIG ---
@@ -605,10 +603,13 @@
 
             if((item.text && item.text.trim()) || (item.label && item.label.trim())) {
                 detailTextBox.style.display = 'block';
-                currentSpunTitle = applySpintax(item.label);
+                
+                // HIER IST DIE ÄNDERUNG: Überschrift OHNE unsichtbare Zeichen generieren (false)
+                currentSpunTitle = applySpintax(item.label, false);
                 detailTitleContent.innerText = currentSpunTitle;
                 
-                currentSpunDesc = applySpintax(item.text);
+                // Text MIT unsichtbaren Zeichen generieren (true)
+                currentSpunDesc = applySpintax(item.text, true);
                 detailTextContent.innerText = currentSpunDesc;
             } else {
                 detailTextBox.style.display = 'none';
