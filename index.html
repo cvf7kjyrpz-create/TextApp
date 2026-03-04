@@ -352,7 +352,54 @@
     <div id="toast">Info</div>
 
     <script>
-        // --- VOLLAUTOMATISCHES WÖRTERBUCH ---
+        // --- 1. TITEL-SHUFFLER (NEU: Ändert Reihenfolge im Titel) ---
+        const titleModifiers = [
+            { match: /\b(neu|ungetragen|nagelneu|brandneu|komplett neu)\b/gi, synonyms: ["Neu", "Ungetragen", "Nagelneu", "Brandneu"] },
+            { match: /\b(schön|toll|wunderschön|klasse)\b/gi, synonyms: ["Schön", "Tolles Teil", "Wunderschön", "Sehr schön"] },
+            { match: /\b(sehr gut|top|einwandfrei|top zustand)\b/gi, synonyms: ["Top Zustand", "Sehr gut erhalten", "Einwandfrei", "Wie neu"] }
+        ];
+
+        function applyTitleSpintax(title) {
+            if(!title) return "";
+            let coreTitle = title;
+            let foundSynonyms = [];
+
+            // Extrahiert gefundene Wörter und sucht Synonyme
+            titleModifiers.forEach(mod => {
+                if (mod.match.test(coreTitle)) {
+                    foundSynonyms.push(mod.synonyms[Math.floor(Math.random() * mod.synonyms.length)]);
+                    // Entfernt das gefundene Wort aus dem Kern-Titel
+                    coreTitle = coreTitle.replace(mod.match, '').trim();
+                }
+            });
+
+            // Säubert übrig gebliebene Leerzeichen oder Satzzeichen
+            coreTitle = coreTitle.replace(/\s+/g, ' ').trim();
+            coreTitle = coreTitle.replace(/^[^a-zA-Z0-9ÄÖÜäöüß]+|[^a-zA-Z0-9ÄÖÜäöüß]+$/g, '').trim();
+
+            if (foundSynonyms.length === 0 || coreTitle === "") {
+                // Wenn keine Modifikatoren gefunden wurden, bleibt der Titel wie er ist (nur Standard-Worttausch)
+                let basicTitle = title;
+                titleModifiers.forEach(mod => {
+                    basicTitle = basicTitle.replace(mod.match, () => mod.synonyms[Math.floor(Math.random() * mod.synonyms.length)]);
+                });
+                return basicTitle;
+            }
+
+            // Kombiniert den sauberen Kern-Titel mit den Synonymen in völlig neuen Reihenfolgen
+            const modifierStr = foundSynonyms.join(" & ");
+            const templates = [
+                `${modifierStr}: ${coreTitle}`,
+                `${coreTitle} - ${modifierStr}`,
+                `${modifierStr} | ${coreTitle}`,
+                `${coreTitle} (${modifierStr})`
+            ];
+
+            return templates[Math.floor(Math.random() * templates.length)];
+        }
+
+
+        // --- 2. TEXT-WÖRTERBUCH (Für die Beschreibung) ---
         const spintaxDict = [
             { match: /\bsehr gut\b/gi, replacements: ["sehr gut", "top Zustand", "einwandfrei", "super Zustand", "klasse Zustand", "ohne Mängel"] },
             { match: /\bneu\b/gi, replacements: ["neu", "ungetragen", "nagelneu", "brandneu", "komplett neu", "ungewaschen und neu"] },
@@ -365,7 +412,6 @@
             { match: /\btierfreier nichtraucherhaushalt\b/gi, replacements: ["tierfreier Nichtraucherhaushalt", "Nichtraucherhaushalt ohne Tiere", "aus tierfreiem Nichtraucherhaushalt"] }
         ];
 
-        // Funktion erhält jetzt eine zweite Variable (addInvisibleChars), um zu steuern, wo getrickst wird
         function applySpintax(text, addInvisibleChars = false) {
             if(!text) return "";
             let result = text;
@@ -388,7 +434,7 @@
                 });
             });
 
-            // 3. Unsichtbare Leerzeichen (NUR wenn erlaubt)
+            // 3. Unsichtbare Leerzeichen für die Textbeschreibung
             if (addInvisibleChars) {
                 let hashedText = "";
                 for(let i=0; i<result.length; i++) {
@@ -604,8 +650,8 @@
             if((item.text && item.text.trim()) || (item.label && item.label.trim())) {
                 detailTextBox.style.display = 'block';
                 
-                // HIER IST DIE ÄNDERUNG: Überschrift OHNE unsichtbare Zeichen generieren (false)
-                currentSpunTitle = applySpintax(item.label, false);
+                // Titel mit dem neuen Shuffler generieren (Keine unsichtbaren Zeichen)
+                currentSpunTitle = applyTitleSpintax(item.label);
                 detailTitleContent.innerText = currentSpunTitle;
                 
                 // Text MIT unsichtbaren Zeichen generieren (true)
