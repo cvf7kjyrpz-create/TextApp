@@ -345,7 +345,7 @@
         <div id="viewerScrollContainer"></div>
         <div class="viewer-actions">
             <button class="viewer-btn" onclick="closeImageViewer()">Schließen</button>
-            <button class="viewer-btn" style="color: var(--accent-purple); font-weight:bold;" onclick="shareImages()">Teilen (Hash ändern)</button>
+            <button class="viewer-btn" style="color: var(--accent-purple); font-weight:bold;" onclick="shareImages()">Teilen (KI Blinder)</button>
         </div>
     </div>
 
@@ -394,7 +394,7 @@
         }
 
 
-        // --- 2. TEXT-WÖRTERBUCH & SHUFFLER (Für die Beschreibung) ---
+        // --- 2. TEXT-WÖRTERBUCH & SHUFFLER ---
         const spintaxDict = [
             { match: /\bsehr gut\b/gi, replacements: ["sehr gut", "top Zustand", "einwandfrei", "super Zustand", "klasse Zustand", "ohne Mängel"] },
             { match: /\bneu\b/gi, replacements: ["neu", "ungetragen", "nagelneu", "brandneu", "komplett neu", "ungewaschen und neu"] },
@@ -421,18 +421,15 @@
                 spintaxRegex.lastIndex = 0;
             }
 
-            // 2. NEU: ZEILEN- UND SATZ-MISCHER (Nur für den Beschreibungstext)
+            // 2. ZEILEN- UND SATZ-MISCHER
             if (addInvisibleChars) {
-                // Den Text anhand von Zeilenumbrüchen auftrennen
                 let lines = result.split('\n').filter(line => line.trim() !== '');
                 
-                // Alle Zeilen/Absätze komplett mischen
                 for (let i = lines.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [lines[i], lines[j]] = [lines[j], lines[i]];
                 }
                 
-                // Falls Sätze innerhalb einer Zeile durch Punkt getrennt sind, auch diese mischen
                 result = lines.map(line => {
                     if (line.includes('. ')) {
                         let sentences = line.split('. ').filter(s => s.trim() !== '');
@@ -443,7 +440,7 @@
                         return sentences.map(s => s.trim() + (s.endsWith('.') || s.endsWith('!') || s.endsWith('?') || s.endsWith(':') ? '' : '.')).join(' ');
                     }
                     return line;
-                }).join('\n\n'); // Mit einem sauberen doppelten Zeilenumbruch wieder zusammensetzen
+                }).join('\n\n'); 
             }
 
             // 3. Automatisches Wörterbuch anwenden
@@ -454,7 +451,7 @@
                 });
             });
 
-            // 4. Unsichtbare Leerzeichen (NUR für den Beschreibungstext)
+            // 4. Unsichtbare Leerzeichen 
             if (addInvisibleChars) {
                 let hashedText = "";
                 for(let i=0; i<result.length; i++) {
@@ -670,11 +667,9 @@
             if((item.text && item.text.trim()) || (item.label && item.label.trim())) {
                 detailTextBox.style.display = 'block';
                 
-                // Titel generieren (ohne unsichtbare Zeichen)
                 currentSpunTitle = applyTitleSpintax(item.label);
                 detailTitleContent.innerText = currentSpunTitle;
                 
-                // Text generieren (inkl. Zeilen mischen und unsichtbaren Zeichen = true)
                 currentSpunDesc = applySpintax(item.text, true);
                 detailTextContent.innerText = currentSpunDesc;
             } else {
@@ -871,7 +866,7 @@
             reader.readAsText(file);
         }
 
-        // --- VIEWER & HASH BUSTING ---
+        // --- VIEWER & VISUELLER KI-BLINDER FÜR BILDER ---
         const imgViewer = document.getElementById('imgViewerOverlay');
         const viewerContainer = document.getElementById('viewerScrollContainer');
         function openImageViewer(imagesArray) {
@@ -888,15 +883,36 @@
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width; canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
+                    
+                    // --- NEU: VISUELLE MANIPULATION FÜR KI-ABWEHR ---
+                    
+                    // 1. Mikro-Rotation (-1.5 bis +1.5 Grad)
+                    const angle = (Math.random() * 3 - 1.5) * Math.PI / 180;
+                    
+                    // 2. Auto-Zoom (2% bis 5% Zoom, schneidet die Ränder minimal neu ab)
+                    const zoom = 1.02 + (Math.random() * 0.03);
+                    
+                    // Bild in die Mitte schieben, rotieren, zoomen und zurückschieben
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(angle);
+                    ctx.scale(zoom, zoom);
+                    ctx.translate(-canvas.width / 2, -canvas.height / 2);
+                    
+                    // Bild mit den neuen Koordinaten zeichnen
                     ctx.drawImage(img, 0, 0);
                     
+                    // Transformationen für den direkten Pixel-Zugriff wieder zurücksetzen
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                    // 3. Hash Busting auf Code-Ebene (1 Pixel unsichtbar ändern)
                     const x = Math.floor(Math.random() * img.width);
                     const y = Math.floor(Math.random() * img.height);
                     const imgData = ctx.getImageData(x, y, 1, 1);
                     imgData.data[0] = (imgData.data[0] + 1) % 256; 
                     ctx.putImageData(imgData, x, y);
                     
-                    const randomQuality = 0.90 + (Math.random() * 0.08); 
+                    // 4. Qualitäts-Variation
+                    const randomQuality = 0.88 + (Math.random() * 0.10); 
                     canvas.toBlob(blob => resolve(blob), 'image/jpeg', randomQuality);
                 };
                 img.src = dataUrl;
@@ -906,7 +922,7 @@
         async function shareImages() {
             if (!viewingItemImages || viewingItemImages.length === 0) return;
             markAsProcessed();
-            showToast("Bilder werden vorbereitet...");
+            showToast("KI Blinder aktiv! Bilder werden bearbeitet...");
             
             const filesArray = [];
             for (let i = 0; i < viewingItemImages.length; i++) {
