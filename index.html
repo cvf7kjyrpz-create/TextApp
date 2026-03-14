@@ -345,14 +345,14 @@
         <div id="viewerScrollContainer"></div>
         <div class="viewer-actions">
             <button class="viewer-btn" onclick="closeImageViewer()">Schließen</button>
-            <button class="viewer-btn" style="color: var(--accent-purple); font-weight:bold;" onclick="shareImages()">Teilen (KI Blinder)</button>
+            <button class="viewer-btn" style="color: var(--accent-purple); font-weight:bold;" onclick="shareImages()">Teilen (EXTREM KI Blinder)</button>
         </div>
     </div>
 
     <div id="toast">Info</div>
 
     <script>
-        // --- 1. TITEL-SHUFFLER ---
+        // --- 1. TITEL-SHUFFLER (EXTREM) ---
         const titleModifiers = [
             { match: /\b(neu|ungetragen|nagelneu|brandneu|komplett neu)\b/gi, synonyms: ["Neu", "Ungetragen", "Nagelneu", "Brandneu"] },
             { match: /\b(schön|toll|wunderschön|klasse)\b/gi, synonyms: ["Schön", "Tolles Teil", "Wunderschön", "Sehr schön"] },
@@ -383,18 +383,31 @@
             }
 
             const modifierStr = foundSynonyms.join(" & ");
-            const templates = [
+            
+            // Erweiterte, Vinted-sichere Templates für maximale Titel-Variation
+            const safeTemplates = [
                 `${modifierStr}: ${coreTitle}`,
                 `${coreTitle} - ${modifierStr}`,
                 `${modifierStr} | ${coreTitle}`,
-                `${coreTitle} (${modifierStr})`
+                `${coreTitle} (${modifierStr})`,
+                `[${modifierStr}] ${coreTitle}`,
+                `${coreTitle} / ${modifierStr}`,
+                `*** ${modifierStr} *** ${coreTitle}`,
+                `${modifierStr} :: ${coreTitle}`
             ];
 
-            return templates[Math.floor(Math.random() * templates.length)];
+            let selectedTemplate = safeTemplates[Math.floor(Math.random() * safeTemplates.length)];
+            
+            // Zufällige Leerzeichen-Variation zur Hash-Änderung (z.B. "Titel - Neu" vs "Titel-Neu")
+            if (Math.random() > 0.5) {
+                selectedTemplate = selectedTemplate.replace(/ - /g, '-').replace(/ \| /g, '|').replace(/ \/ /g, '/').replace(/: /g, ':');
+            }
+
+            return selectedTemplate;
         }
 
 
-        // --- 2. TEXT-WÖRTERBUCH & SHUFFLER ---
+        // --- 2. TEXT-WÖRTERBUCH & EXTREM-SHUFFLER ---
         const spintaxDict = [
             { match: /\bsehr gut\b/gi, replacements: ["sehr gut", "top Zustand", "einwandfrei", "super Zustand", "klasse Zustand", "ohne Mängel"] },
             { match: /\bneu\b/gi, replacements: ["neu", "ungetragen", "nagelneu", "brandneu", "komplett neu", "ungewaschen und neu"] },
@@ -451,17 +464,32 @@
                 });
             });
 
-            // 4. Unsichtbare Leerzeichen 
+            // 4. Unsichtbare Leerzeichen (EXTREM-MODUS mit 3 Zeichenarten)
             if (addInvisibleChars) {
+                // Zero-Width Space, Zero-Width Non-Joiner, Zero-Width Joiner
+                const invisibles = ['\u200B', '\u200C', '\u200D'];
                 let hashedText = "";
                 for(let i=0; i<result.length; i++) {
                     hashedText += result[i];
-                    if (result[i] === ' ' && Math.random() > 0.5) {
-                        hashedText += '\u200B';
+                    
+                    if (result[i] === ' ') {
+                        const count = Math.floor(Math.random() * 3) + 1; // 1 bis 3 Zeichen pro Leerzeichen
+                        for(let j=0; j<count; j++) {
+                            hashedText += invisibles[Math.floor(Math.random() * invisibles.length)];
+                        }
+                    } 
+                    else if (Math.random() > 0.8) { 
+                        // 20% Chance für unsichtbares Zeichen mitten im Wort
+                        hashedText += invisibles[Math.floor(Math.random() * invisibles.length)];
                     }
                 }
-                const randomEndPadding = '\u200B'.repeat(Math.floor(Math.random() * 5));
-                hashedText += randomEndPadding;
+                
+                // Zufälliges Ende (3 bis 10 unsichtbare Zeichen)
+                const randomEndCount = Math.floor(Math.random() * 8) + 3;
+                for(let k=0; k<randomEndCount; k++) {
+                    hashedText += invisibles[Math.floor(Math.random() * invisibles.length)];
+                }
+                
                 return hashedText;
             }
 
@@ -866,7 +894,7 @@
             reader.readAsText(file);
         }
 
-        // --- VIEWER & VISUELLER KI-BLINDER FÜR BILDER ---
+        // --- VIEWER & EXTREMER VISUELLER KI-BLINDER FÜR BILDER ---
         const imgViewer = document.getElementById('imgViewerOverlay');
         const viewerContainer = document.getElementById('viewerScrollContainer');
         function openImageViewer(imagesArray) {
@@ -884,35 +912,45 @@
                     canvas.width = img.width; canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
                     
-                    // --- NEU: VISUELLE MANIPULATION FÜR KI-ABWEHR ---
+                    // --- NEU: MAXIMALE VISUELLE MANIPULATION FÜR KI-ABWEHR ---
                     
-                    // 1. Mikro-Rotation (-1.5 bis +1.5 Grad)
-                    const angle = (Math.random() * 3 - 1.5) * Math.PI / 180;
+                    // 1. Stärkere Mikro-Rotation (-2.5 bis +2.5 Grad)
+                    const angle = (Math.random() * 5 - 2.5) * Math.PI / 180;
                     
-                    // 2. Auto-Zoom (2% bis 5% Zoom, schneidet die Ränder minimal neu ab)
-                    const zoom = 1.02 + (Math.random() * 0.03);
+                    // 2. Stärkerer Auto-Zoom (1% bis 6% Zoom)
+                    const zoom = 1.01 + (Math.random() * 0.05);
                     
-                    // Bild in die Mitte schieben, rotieren, zoomen und zurückschieben
-                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    // 3. Bildverschiebung (Translation X und Y um bis zu 4 Pixel verschieben)
+                    const transX = Math.random() * 8 - 4;
+                    const transY = Math.random() * 8 - 4;
+                    
+                    // 4. Subtile Helligkeits- & Kontrast-Änderung (96% bis 104%)
+                    ctx.filter = `brightness(${0.96 + Math.random() * 0.08}) contrast(${0.96 + Math.random() * 0.08})`;
+
+                    // Transformationen anwenden
+                    ctx.translate(canvas.width / 2 + transX, canvas.height / 2 + transY);
                     ctx.rotate(angle);
                     ctx.scale(zoom, zoom);
                     ctx.translate(-canvas.width / 2, -canvas.height / 2);
                     
-                    // Bild mit den neuen Koordinaten zeichnen
+                    // Bild mit den neuen Koordinaten und Filtern zeichnen
                     ctx.drawImage(img, 0, 0);
                     
-                    // Transformationen für den direkten Pixel-Zugriff wieder zurücksetzen
+                    // Transformationen und Filter wieder zurücksetzen
                     ctx.setTransform(1, 0, 0, 1, 0, 0);
+                    ctx.filter = 'none';
 
-                    // 3. Hash Busting auf Code-Ebene (1 Pixel unsichtbar ändern)
-                    const x = Math.floor(Math.random() * img.width);
-                    const y = Math.floor(Math.random() * img.height);
-                    const imgData = ctx.getImageData(x, y, 1, 1);
-                    imgData.data[0] = (imgData.data[0] + 1) % 256; 
-                    ctx.putImageData(imgData, x, y);
+                    // 5. Hash Busting Extrem (20 Pixel unsichtbar verändern)
+                    for(let i=0; i<20; i++) {
+                        const x = Math.floor(Math.random() * img.width);
+                        const y = Math.floor(Math.random() * img.height);
+                        const imgData = ctx.getImageData(x, y, 1, 1);
+                        imgData.data[0] = (imgData.data[0] + (Math.random() > 0.5 ? 1 : -1)) % 256; 
+                        ctx.putImageData(imgData, x, y);
+                    }
                     
-                    // 4. Qualitäts-Variation
-                    const randomQuality = 0.88 + (Math.random() * 0.10); 
+                    // 6. Maximale Qualitäts-Variation (zwischen 80% und 96%)
+                    const randomQuality = 0.80 + (Math.random() * 0.16); 
                     canvas.toBlob(blob => resolve(blob), 'image/jpeg', randomQuality);
                 };
                 img.src = dataUrl;
