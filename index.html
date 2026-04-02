@@ -176,8 +176,8 @@
         /* --- EDIT FORM STYLES --- */
         .modal-input { width: 100%; padding: 10px; background-color: #1C1C1E; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 0.9rem; box-sizing: border-box; margin-bottom: 12px; }
         
-        /* VERGRÖSSERTES TEXTFELD */
-        .modal-textarea { width: 100%; padding: 10px; background-color: #1C1C1E; border: 1px solid #333; border-radius: 8px; color: #ddd; font-size: 0.9rem; box-sizing: border-box; resize: none; min-height: 220px; margin-bottom: 12px; font-family: inherit; }
+        /* VERGRÖSSERTES TEXTFELD - Auf 450px angepasst */
+        .modal-textarea { width: 100%; padding: 10px; background-color: #1C1C1E; border: 1px solid #333; border-radius: 8px; color: #ddd; font-size: 0.9rem; box-sizing: border-box; resize: none; min-height: 450px; margin-bottom: 12px; font-family: inherit; }
         
         .price-flex { display: flex; gap: 10px; margin-bottom: 12px; }
         .price-flex input { margin-bottom: 0; }
@@ -354,6 +354,19 @@
     <div id="toast">Info</div>
 
     <script>
+        // --- NEUE SICHERE ICONS & VERSAND-PHRASEN ---
+        const safeIcons = ["✨", "📦", "⭐", "👍", "👕", "👗", "👟", "👜", "🌸", "💎", "✅", "🔥", "🌈", "🏷️", "📸", "🎁", "💫", "🌿"];
+        
+        const shippingVariations = [
+            "Versand möglich", 
+            "Verschicke gerne", 
+            "Versand ist kein Problem",
+            "Schneller Versand möglich",
+            "Verschicke es direkt am nächsten Tag",
+            "Zügiger Versand garantiert",
+            "Gern auch per Post"
+        ];
+
         // --- 1. TITEL-SHUFFLER (SAUBER) ---
         const titleModifiers = [
             { match: /\b(neu|ungetragen|nagelneu|brandneu|komplett neu)\b/gi, synonyms: ["Neu", "Ungetragen", "Nagelneu", "Brandneu"] },
@@ -376,28 +389,36 @@
             coreTitle = coreTitle.replace(/\s+/g, ' ').trim();
             coreTitle = coreTitle.replace(/^[^a-zA-Z0-9ÄÖÜäöüß]+|[^a-zA-Z0-9ÄÖÜäöüß]+$/g, '').trim();
 
+            let finalTitle = "";
+
             if (foundSynonyms.length === 0 || coreTitle === "") {
                 let basicTitle = title;
                 titleModifiers.forEach(mod => {
                     basicTitle = basicTitle.replace(mod.match, () => mod.synonyms[Math.floor(Math.random() * mod.synonyms.length)]);
                 });
-                return basicTitle;
+                finalTitle = basicTitle;
+            } else {
+                const modifierStr = foundSynonyms.join(" & ");
+                const safeTemplates = [
+                    `${modifierStr}: ${coreTitle}`,
+                    `${coreTitle} - ${modifierStr}`,
+                    `${modifierStr} | ${coreTitle}`,
+                    `${coreTitle} (${modifierStr})`,
+                    `[${modifierStr}] ${coreTitle}`,
+                    `${coreTitle} / ${modifierStr}`,
+                    `*** ${modifierStr} *** ${coreTitle}`,
+                    `${modifierStr} :: ${coreTitle}`
+                ];
+                finalTitle = safeTemplates[Math.floor(Math.random() * safeTemplates.length)];
             }
 
-            const modifierStr = foundSynonyms.join(" & ");
-            
-            const safeTemplates = [
-                `${modifierStr}: ${coreTitle}`,
-                `${coreTitle} - ${modifierStr}`,
-                `${modifierStr} | ${coreTitle}`,
-                `${coreTitle} (${modifierStr})`,
-                `[${modifierStr}] ${coreTitle}`,
-                `${coreTitle} / ${modifierStr}`,
-                `*** ${modifierStr} *** ${coreTitle}`,
-                `${modifierStr} :: ${coreTitle}`
-            ];
+            // NEU: Zufälliges Icon am Anfang des Titels (25% Wahrscheinlichkeit)
+            if (Math.random() > 0.25) {
+                const icon = safeIcons[Math.floor(Math.random() * safeIcons.length)];
+                finalTitle = icon + " " + finalTitle;
+            }
 
-            return safeTemplates[Math.floor(Math.random() * safeTemplates.length)];
+            return finalTitle;
         }
 
 
@@ -458,10 +479,16 @@
                 });
             });
 
-            // 4. KI-BLINDER FÜR DEN TEXT (SATZZEICHEN, EMOJIS & UNSICHTBARE ZEICHEN)
+            // 4. KI-BLINDER FÜR DEN TEXT (SATZZEICHEN, EMOJIS, VERSAND & UNSICHTBARE ZEICHEN)
             if (addInvisibleChars) {
                 
-                // NEU: Satzzeichen-Multiplikator (. wird zu .. oder ! zu !!!)
+                // NEU: Automatischer Versandzusatz (Wenn nicht erwähnt, 70% Chance hinzuzufügen)
+                if (!result.toLowerCase().includes("versand") && Math.random() > 0.3) {
+                    const ship = shippingVariations[Math.floor(Math.random() * shippingVariations.length)];
+                    result += "\n\n" + ship + ".";
+                }
+
+                // Satzzeichen-Multiplikator (. wird zu .. oder ! zu !!!)
                 // Wir haben eine 30% Chance, dass ein Satzzeichen am Ende modifiziert wird.
                 result = result.replace(/([.!?])/g, (matchChar) => {
                     if (Math.random() < 0.3) {
@@ -478,11 +505,9 @@
                     result += safeInvisibleSpace;
                 }
                 
-                // NEU: Zufälliges Emoji am Ende anfügen (50% Wahrscheinlichkeit)
-                // Verändert den Text-Hash dramatisch, ohne aufdringlich zu sein.
-                const safeEmojis = ['✨', '📦', '👍', '😊', '👗', '👚', '👖', '👟', '⭐', '🤍', '🌸', '✌️'];
+                // NEU: Zufälliges Emoji am Ende anfügen aus der großen Icon-Liste (50% Wahrscheinlichkeit)
                 if (Math.random() < 0.5) {
-                    result += " " + safeEmojis[Math.floor(Math.random() * safeEmojis.length)];
+                    result += " " + safeIcons[Math.floor(Math.random() * safeIcons.length)];
                 }
             }
 
