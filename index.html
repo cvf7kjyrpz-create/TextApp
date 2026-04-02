@@ -352,7 +352,7 @@
     <div id="toast">Info</div>
 
     <script>
-        // --- 1. TITEL-SHUFFLER (EXTREM) ---
+        // --- 1. TITEL-SHUFFLER (SAUBER) ---
         const titleModifiers = [
             { match: /\b(neu|ungetragen|nagelneu|brandneu|komplett neu)\b/gi, synonyms: ["Neu", "Ungetragen", "Nagelneu", "Brandneu"] },
             { match: /\b(schön|toll|wunderschön|klasse)\b/gi, synonyms: ["Schön", "Tolles Teil", "Wunderschön", "Sehr schön"] },
@@ -384,7 +384,7 @@
 
             const modifierStr = foundSynonyms.join(" & ");
             
-            // Erweiterte, Vinted-sichere Templates für maximale Titel-Variation
+            // Erweiterte, Vinted-sichere Templates, die immer sauber und lesbar bleiben
             const safeTemplates = [
                 `${modifierStr}: ${coreTitle}`,
                 `${coreTitle} - ${modifierStr}`,
@@ -396,18 +396,11 @@
                 `${modifierStr} :: ${coreTitle}`
             ];
 
-            let selectedTemplate = safeTemplates[Math.floor(Math.random() * safeTemplates.length)];
-            
-            // Zufällige Leerzeichen-Variation zur Hash-Änderung (z.B. "Titel - Neu" vs "Titel-Neu")
-            if (Math.random() > 0.5) {
-                selectedTemplate = selectedTemplate.replace(/ - /g, '-').replace(/ \| /g, '|').replace(/ \/ /g, '/').replace(/: /g, ':');
-            }
-
-            return selectedTemplate;
+            return safeTemplates[Math.floor(Math.random() * safeTemplates.length)];
         }
 
 
-        // --- 2. TEXT-WÖRTERBUCH & EXTREM-SHUFFLER ---
+        // --- 2. TEXT-WÖRTERBUCH & SAUBERER SHUFFLER ---
         const spintaxDict = [
             { match: /\bsehr gut\b/gi, replacements: ["sehr gut", "top Zustand", "einwandfrei", "super Zustand", "klasse Zustand", "ohne Mängel"] },
             { match: /\bneu\b/gi, replacements: ["neu", "ungetragen", "nagelneu", "brandneu", "komplett neu", "ungewaschen und neu"] },
@@ -464,33 +457,18 @@
                 });
             });
 
-            // 4. Unsichtbare Leerzeichen (EXTREM-MODUS mit 3 Zeichenarten)
+            // 4. Unsichtbare Leerzeichen (MENSCHLICH LESBAR)
             if (addInvisibleChars) {
-                // Zero-Width Space, Zero-Width Non-Joiner, Zero-Width Joiner
-                const invisibles = ['\u200B', '\u200C', '\u200D'];
-                let hashedText = "";
-                for(let i=0; i<result.length; i++) {
-                    hashedText += result[i];
-                    
-                    if (result[i] === ' ') {
-                        const count = Math.floor(Math.random() * 3) + 1; // 1 bis 3 Zeichen pro Leerzeichen
-                        for(let j=0; j<count; j++) {
-                            hashedText += invisibles[Math.floor(Math.random() * invisibles.length)];
-                        }
-                    } 
-                    else if (Math.random() > 0.8) { 
-                        // 20% Chance für unsichtbares Zeichen mitten im Wort
-                        hashedText += invisibles[Math.floor(Math.random() * invisibles.length)];
-                    }
-                }
+                // Nur noch Zero-Width Space, keine Zeichen die Wörter trennen!
+                const safeInvisibleSpace = '\u200B';
                 
-                // Zufälliges Ende (3 bis 10 unsichtbare Zeichen)
-                const randomEndCount = Math.floor(Math.random() * 8) + 3;
+                // Wir hängen einfach eine zufällige Menge (5 bis 20) dieser unsichtbaren Zeichen an das
+                // absolute Ende des gesamten Textes an. 
+                // Das ändert den Hash für die KI komplett, lässt den Text aber völlig unangetastet und lesbar.
+                const randomEndCount = Math.floor(Math.random() * 16) + 5;
                 for(let k=0; k<randomEndCount; k++) {
-                    hashedText += invisibles[Math.floor(Math.random() * invisibles.length)];
+                    result += safeInvisibleSpace;
                 }
-                
-                return hashedText;
             }
 
             return result;
