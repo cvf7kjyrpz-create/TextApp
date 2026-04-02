@@ -175,7 +175,9 @@
 
         /* --- EDIT FORM STYLES --- */
         .modal-input { width: 100%; padding: 10px; background-color: #1C1C1E; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 0.9rem; box-sizing: border-box; margin-bottom: 12px; }
-        .modal-textarea { width: 100%; padding: 10px; background-color: #1C1C1E; border: 1px solid #333; border-radius: 8px; color: #ddd; font-size: 0.9rem; box-sizing: border-box; resize: none; min-height: 90px; margin-bottom: 12px; font-family: inherit; }
+        
+        /* VERGRÖSSERTES TEXTFELD */
+        .modal-textarea { width: 100%; padding: 10px; background-color: #1C1C1E; border: 1px solid #333; border-radius: 8px; color: #ddd; font-size: 0.9rem; box-sizing: border-box; resize: none; min-height: 220px; margin-bottom: 12px; font-family: inherit; }
         
         .price-flex { display: flex; gap: 10px; margin-bottom: 12px; }
         .price-flex input { margin-bottom: 0; }
@@ -267,7 +269,7 @@
                     <input type="number" id="modalMaxPrice" class="modal-input" placeholder="Max €" step="0.50">
                 </div>
 
-                <textarea id="modalText" class="modal-textarea" placeholder="Beschreibungstext..."></textarea>
+                <textarea id="modalText" class="modal-textarea" placeholder="Beschreibungstext... (Nutze z.B. {Neu|Ungetragen} für mehr KI-Sicherheit)"></textarea>
                 
                 <div class="file-upload-wrapper">
                     <label for="fileInput" class="file-btn">📷 Bilder hinzufügen</label>
@@ -384,7 +386,6 @@
 
             const modifierStr = foundSynonyms.join(" & ");
             
-            // Erweiterte, Vinted-sichere Templates, die immer sauber und lesbar bleiben
             const safeTemplates = [
                 `${modifierStr}: ${coreTitle}`,
                 `${coreTitle} - ${modifierStr}`,
@@ -400,7 +401,7 @@
         }
 
 
-        // --- 2. TEXT-WÖRTERBUCH & SAUBERER SHUFFLER ---
+        // --- 2. TEXT-WÖRTERBUCH & ERWEITERTER SHUFFLER ---
         const spintaxDict = [
             { match: /\bsehr gut\b/gi, replacements: ["sehr gut", "top Zustand", "einwandfrei", "super Zustand", "klasse Zustand", "ohne Mängel"] },
             { match: /\bneu\b/gi, replacements: ["neu", "ungetragen", "nagelneu", "brandneu", "komplett neu", "ungewaschen und neu"] },
@@ -417,7 +418,7 @@
             if(!text) return "";
             let result = text;
             
-            // 1. Manuelle Spintax-Klammern auswerten
+            // 1. Manuelle Spintax-Klammern auswerten {A|B|C}
             const spintaxRegex = /\{([^{}]+)\}/g;
             let match;
             while ((match = spintaxRegex.exec(result)) !== null) {
@@ -457,17 +458,31 @@
                 });
             });
 
-            // 4. Unsichtbare Leerzeichen (MENSCHLICH LESBAR)
+            // 4. KI-BLINDER FÜR DEN TEXT (SATZZEICHEN, EMOJIS & UNSICHTBARE ZEICHEN)
             if (addInvisibleChars) {
-                // Nur noch Zero-Width Space, keine Zeichen die Wörter trennen!
-                const safeInvisibleSpace = '\u200B';
                 
-                // Wir hängen einfach eine zufällige Menge (5 bis 20) dieser unsichtbaren Zeichen an das
-                // absolute Ende des gesamten Textes an. 
-                // Das ändert den Hash für die KI komplett, lässt den Text aber völlig unangetastet und lesbar.
+                // NEU: Satzzeichen-Multiplikator (. wird zu .. oder ! zu !!!)
+                // Wir haben eine 30% Chance, dass ein Satzzeichen am Ende modifiziert wird.
+                result = result.replace(/([.!?])/g, (matchChar) => {
+                    if (Math.random() < 0.3) {
+                        const extraCount = Math.floor(Math.random() * 2) + 1; // 1 oder 2 zusätzliche Zeichen
+                        return matchChar.repeat(extraCount + 1);
+                    }
+                    return matchChar;
+                });
+
+                // Unsichtbare Leerzeichen (MENSCHLICH LESBAR)
+                const safeInvisibleSpace = '\u200B';
                 const randomEndCount = Math.floor(Math.random() * 16) + 5;
                 for(let k=0; k<randomEndCount; k++) {
                     result += safeInvisibleSpace;
+                }
+                
+                // NEU: Zufälliges Emoji am Ende anfügen (50% Wahrscheinlichkeit)
+                // Verändert den Text-Hash dramatisch, ohne aufdringlich zu sein.
+                const safeEmojis = ['✨', '📦', '👍', '😊', '👗', '👚', '👖', '👟', '⭐', '🤍', '🌸', '✌️'];
+                if (Math.random() < 0.5) {
+                    result += " " + safeEmojis[Math.floor(Math.random() * safeEmojis.length)];
                 }
             }
 
@@ -890,35 +905,23 @@
                     canvas.width = img.width; canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
                     
-                    // --- NEU: MAXIMALE VISUELLE MANIPULATION FÜR KI-ABWEHR ---
-                    
-                    // 1. Stärkere Mikro-Rotation (-2.5 bis +2.5 Grad)
                     const angle = (Math.random() * 5 - 2.5) * Math.PI / 180;
-                    
-                    // 2. Stärkerer Auto-Zoom (1% bis 6% Zoom)
                     const zoom = 1.01 + (Math.random() * 0.05);
-                    
-                    // 3. Bildverschiebung (Translation X und Y um bis zu 4 Pixel verschieben)
                     const transX = Math.random() * 8 - 4;
                     const transY = Math.random() * 8 - 4;
                     
-                    // 4. Subtile Helligkeits- & Kontrast-Änderung (96% bis 104%)
                     ctx.filter = `brightness(${0.96 + Math.random() * 0.08}) contrast(${0.96 + Math.random() * 0.08})`;
 
-                    // Transformationen anwenden
                     ctx.translate(canvas.width / 2 + transX, canvas.height / 2 + transY);
                     ctx.rotate(angle);
                     ctx.scale(zoom, zoom);
                     ctx.translate(-canvas.width / 2, -canvas.height / 2);
                     
-                    // Bild mit den neuen Koordinaten und Filtern zeichnen
                     ctx.drawImage(img, 0, 0);
                     
-                    // Transformationen und Filter wieder zurücksetzen
                     ctx.setTransform(1, 0, 0, 1, 0, 0);
                     ctx.filter = 'none';
 
-                    // 5. Hash Busting Extrem (20 Pixel unsichtbar verändern)
                     for(let i=0; i<20; i++) {
                         const x = Math.floor(Math.random() * img.width);
                         const y = Math.floor(Math.random() * img.height);
@@ -927,7 +930,6 @@
                         ctx.putImageData(imgData, x, y);
                     }
                     
-                    // 6. Maximale Qualitäts-Variation (zwischen 80% und 96%)
                     const randomQuality = 0.80 + (Math.random() * 0.16); 
                     canvas.toBlob(blob => resolve(blob), 'image/jpeg', randomQuality);
                 };
